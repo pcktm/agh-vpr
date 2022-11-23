@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 import passlib.hash as _hash
 import datetime as date
 
-from .database import Base
+from database import Base
 
 
 class User(Base):
@@ -22,7 +22,7 @@ class User(Base):
 
 
 class Place(Base):
-    __tablename__ = "images"
+    __tablename__ = "places"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
