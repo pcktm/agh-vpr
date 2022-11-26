@@ -39,9 +39,10 @@ class Image(Base):
     id = Column(Integer, primary_key=True, index=True)
     place_id = Column(Integer, ForeignKey("places.id"))
     image = Column(String, index=True)
-    key_points = Column(String, index=True)
-    score = Column(String, index=True)
-    descriptor = Column(String, index=True)
+    # image = Column(String, index=True)
+    # key_points = Column(String, index=True)
+    # score = Column(String, index=True)
+    # descriptor = Column(String, index=True)
 
     place = relationship("Place", back_populates="images")
 

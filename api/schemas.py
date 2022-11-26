@@ -22,6 +22,8 @@ class History(HistoryBase):
 
 class UserBase(BaseModel):
     email: str
+    first_name: str
+    last_name: str
 
 
 class UserCreate(UserBase):
@@ -33,8 +35,6 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    first_name: str
-    last_name: str
     history: list[History] = []
 
     class Config:
@@ -43,9 +43,10 @@ class User(UserBase):
 
 class ImageBase(BaseModel):
     image: str
-    key_points: str
-    score: str
-    descriptor: str
+    place_id: int
+    # key_points: str
+    # score: str
+    # descriptor: str
 
 
 class ImageCreate(ImageBase):
@@ -54,7 +55,6 @@ class ImageCreate(ImageBase):
 
 class Image(ImageBase):
     id: int
-    place_id: int
 
     class Config:
         orm_mode = True

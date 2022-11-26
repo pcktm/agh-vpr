@@ -5,6 +5,12 @@ from VPR.models.matching import Matching
 from VPR.models.superpoint import SuperPoint
 from VPR.models.utils import read_image
 
+from database import get_db
+import crud
+import schemas
+
+
+# TODO: hash function
 
 def match(img_name):
     torch.set_grad_enabled(False)
@@ -37,7 +43,7 @@ def match(img_name):
 
     best = (0, None)
 
-    for index, image in enumerate(images):
+    for image in images:
         pred1 = {}
         pred1['image0'] = inp0
         pred1 = {**pred1, **{k + '0': v for k, v in pred0.items()}}
@@ -49,27 +55,9 @@ def match(img_name):
 
         valid = matches > -1
         mkpts0 = kpts0[valid]
-        mkpts1 = kpts1[matches[valid]]
-        mconf = conf[valid]
-        color = cm.jet(mconf)
-        text = [
-            'SuperGlue',
-            'Keypoints: {}:{}'.format(len(kpts0), len(kpts1)),
-            'Matches: {}'.format(len(mkpts0)),
-        ]
-
-        # Display extra parameter info.
-        k_thresh = matching.superpoint.config['keypoint_threshold']
-        m_thresh = matching.superglue.config['match_threshold']
-        small_text = [
-            'Keypoint Threshold: {:.4f}'.format(k_thresh),
-            'Match Threshold: {:.2f}'.format(m_thresh),
-        ]
-
-        save_path = f"output/{str(index)}.jpg"
 
         if len(mkpts0) > best[0]:
-            best = (len(mkpts0), save_path)
+            best = (len(mkpts0), image)
 
     return best
 
