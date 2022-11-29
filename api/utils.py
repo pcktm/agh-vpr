@@ -5,12 +5,9 @@ from VPR.models.matching import Matching
 from VPR.models.superpoint import SuperPoint
 from VPR.models.utils import read_image
 
-from database import get_db
 import crud
 import schemas
 
-
-# TODO: hash function
 
 def match(img_name):
     torch.set_grad_enabled(False)
@@ -41,7 +38,8 @@ def match(img_name):
     pred0 = superpoint({'image': inp0})
     pred = {**pred, **{k + '1': v for k, v in pred0.items()}}
 
-    best = (0, None)
+    best = []
+    # best = (0, None)
 
     for image in images:
         pred1 = {}
@@ -56,9 +54,26 @@ def match(img_name):
         valid = matches > -1
         mkpts0 = kpts0[valid]
 
-        if len(mkpts0) > best[0]:
-            best = (len(mkpts0), image)
+        # if len(mkpts0) > best[0]:
+        #     best = (len(mkpts0), image)
+        best.append((len(mkpts0), image))
+
+    best.sort(key=lambda tup: tup[0], reverse=True)
 
     return best
 
 
+def best_match(img_name, db):
+    best = match(img_name)
+
+    places = {}
+    for image in best:
+        image_name = image[1]
+        try:
+            place_id = crud.get_image_by_name(db, image_name).place_id
+            place = crud.get_place(db, place_id)
+            places[place.name] = {place.address, place.description}
+        except:
+            pass
+
+    return places

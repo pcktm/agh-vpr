@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Depends
 import shutil
 from sqlalchemy.orm import Session
-from utils import match
+from utils import best_match
 
 from database import get_db
 import crud
@@ -17,9 +17,6 @@ router = APIRouter(
 async def root(file: UploadFile = File(...), db: Session = Depends(get_db)):
     with open(f'ImgFromUser/{file.filename}', 'wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
-    image = match(file.filename)[1]
+    places = best_match(file.filename, db)
 
-    place_id = crud.get_image_by_name(db, image).place_id
-    place = crud.get_place(db, place_id)
-
-    return {place.name, place.address, place.description}
+    return places
