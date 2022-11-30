@@ -1,47 +1,79 @@
-import matplotlib.cm as cm
 import torch
 import pickle
+import cv2
+
 from VPR.models.matching import Matching
 from VPR.models.superpoint import SuperPoint
 from VPR.models.utils import read_image
+from VPR.BOVW import features, build_histogram
+from sklearn.neighbors import NearestNeighbors
 
 import crud
-import schemas
+
+torch.set_grad_enabled(False)
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+config = {
+    'superpoint': {
+        'nms_radius': 4,
+        'keypoint_threshold': 0.005,
+        'max_keypoints': 1024
+    },
+    'superglue': {
+        'weights': 'outdoor',
+        'sinkhorn_iterations': 20,
+        'match_threshold': 0.2,
+    }
+}
+
+matching = Matching(config).eval().to(device)
+superpoint = SuperPoint(config.get('superpoint', {}))
+extractor = cv2.xfeatures2d.SIFT_create()
+
+with open('VPR/images_paths.pkl', 'rb') as f:
+    images_paths = pickle.load(f)
+
+
+def bag_of_vwords_search(img_name):
+
+    with open('VPR/kmeans_bovw_model.pkl', 'rb') as fp:
+        kmeans = pickle.load(fp)
+
+    preprocessed_image = []
+    for image_path in images_paths:
+        image = cv2.imread(f"VPR/{image_path}")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        keypoint, descriptor = features(image, extractor)
+        if descriptor is not None:
+            histogram = build_histogram(descriptor, kmeans)
+            preprocessed_image.append(histogram)
+
+    data = cv2.imread(f"ImgFromUser/{img_name}")
+    data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+    keypoint, descriptor = features(data, extractor)
+    histogram = build_histogram(descriptor, kmeans)
+    neighbor = NearestNeighbors(n_neighbors=20)
+    neighbor.fit(preprocessed_image)
+    dist, result = neighbor.kneighbors([histogram])
+
+    return result[0]
 
 
 def match(img_name):
-    torch.set_grad_enabled(False)
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-    config = {
-        'superpoint': {
-            'nms_radius': 4,
-            'keypoint_threshold': 0.005,
-            'max_keypoints': 1024
-        },
-        'superglue': {
-            'weights': 'outdoor',
-            'sinkhorn_iterations': 20,
-            'match_threshold': 0.2,
-        }
-    }
-
-    matching = Matching(config).eval().to(device)
-    superpoint = SuperPoint(config.get('superpoint', {}))
-
-    with open('tmp_images.p', 'rb') as fp:
+    with open('images.p', 'rb') as fp:
         images = pickle.load(fp)
 
     image0, inp0, scales0 = read_image(f"ImgFromUser/{img_name}", device, [640, 480], 0, 1)
-    pred = {}
     pred0 = superpoint({'image': inp0})
-    pred = {**pred, **{k + '1': v for k, v in pred0.items()}}
+
+    bag_of_vwords_search_result = bag_of_vwords_search(img_name)
+    images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
 
     best = []
-    # best = (0, None)
 
-    for image in images:
+    for image in images_paths_:
         pred1 = {}
         pred1['image0'] = inp0
         pred1 = {**pred1, **{k + '0': v for k, v in pred0.items()}}
@@ -54,8 +86,6 @@ def match(img_name):
         valid = matches > -1
         mkpts0 = kpts0[valid]
 
-        # if len(mkpts0) > best[0]:
-        #     best = (len(mkpts0), image)
         best.append((len(mkpts0), image))
 
     best.sort(key=lambda tup: tup[0], reverse=True)
@@ -66,14 +96,35 @@ def match(img_name):
 def best_match(img_name, db):
     best = match(img_name)
 
-    places = {}
+    # places = {}
+    places = []
     for image in best:
         image_name = image[1]
         try:
             place_id = crud.get_image_by_name(db, image_name).place_id
             place = crud.get_place(db, place_id)
-            places[place.name] = {place.address, place.description}
+            place_details = (place.name, place.address, place.description)
+            if place_details not in places:
+                places.append(place_details)
+            # places[place.name] = {place.address, place.description}
         except:
             pass
-
     return places
+
+
+def add_image_to_file(filename):
+
+    with open('images.p', 'rb') as fp:
+        images = pickle.load(fp)
+
+    pred = {}
+
+    image, inp, scales = read_image(filename, device, [640, 480], 0, 1)
+
+    pred['image'] = inp
+    pred1 = superpoint({'image': inp})
+    pred = {**pred, **{k: v for k, v in pred1.items()}}
+    images[f'{filename}'] = pred
+
+    with open('images.p', 'wb') as fp:
+        pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
