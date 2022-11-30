@@ -6,6 +6,7 @@ from models import Base
 from database import engine
 from routers.places import router as places_routers
 from routers.users import router as users_routers
+import os
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,6 +25,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+path = "ImgFromUser"
+if not os.path.exists(path):
+    os.mkdir(path)
 
 app.include_router(places_routers)
 app.include_router(users_routers)
