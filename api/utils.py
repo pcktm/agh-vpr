@@ -34,20 +34,14 @@ extractor = cv2.xfeatures2d.SIFT_create()
 with open('VPR/images_paths.pkl', 'rb') as f:
     images_paths = pickle.load(f)
 
+with open("VPR/preprocessed_image.pkl", "rb") as fb:
+    preprocessed_image = pickle.load(fb)
+
+with open('VPR/kmeans_bovw_model.pkl', 'rb') as fp:
+    kmeans = pickle.load(fp)
+
 
 def bag_of_vwords_search(img_name):
-
-    with open('VPR/kmeans_bovw_model.pkl', 'rb') as fp:
-        kmeans = pickle.load(fp)
-
-    preprocessed_image = []
-    for image_path in images_paths:
-        image = cv2.imread(f"VPR/{image_path}")
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        keypoint, descriptor = features(image, extractor)
-        if descriptor is not None:
-            histogram = build_histogram(descriptor, kmeans)
-            preprocessed_image.append(histogram)
 
     data = cv2.imread(f"ImgFromUser/{img_name}")
     data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
@@ -62,7 +56,7 @@ def bag_of_vwords_search(img_name):
 
 def match(img_name):
 
-    with open('images.p', 'rb') as fp:
+    with open('VPR/images.p', 'rb') as fp:
         images = pickle.load(fp)
 
     image0, inp0, scales0 = read_image(f"ImgFromUser/{img_name}", device, [640, 480], 0, 1)
@@ -114,7 +108,7 @@ def best_match(img_name, db):
 
 def add_image_to_file(filename):
 
-    with open('images.p', 'rb') as fp:
+    with open('VPR/images.p', 'rb') as fp:
         images = pickle.load(fp)
 
     pred = {}
@@ -126,5 +120,8 @@ def add_image_to_file(filename):
     pred = {**pred, **{k: v for k, v in pred1.items()}}
     images[f'{filename}'] = pred
 
-    with open('images.p', 'wb') as fp:
+    with open('VPR/images.p', 'wb') as fp:
         pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+print(match('query4.jpg'))
