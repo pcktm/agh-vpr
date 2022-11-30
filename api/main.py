@@ -2,10 +2,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from Places.routers import router as places_routers
-from Accounts.routers import router as accounts_routers
 from models import Base
 from database import engine
+from routers.places import router as places_routers
+from routers.users import router as users_routers
 
 Base.metadata.create_all(bind=engine)
 
@@ -26,6 +26,6 @@ app.add_middleware(
 )
 
 app.include_router(places_routers)
-app.include_router(accounts_routers)
+app.include_router(users_routers)
 # uvicorn.run(app, host="127.0.0.1", port=5000, log_level="info")
 
