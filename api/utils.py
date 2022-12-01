@@ -28,7 +28,7 @@ config = {
 }
 
 matching = Matching(config).eval().to(device)
-superpoint = SuperPoint(config.get('superpoint', {}))
+superpoint = matching.superpoint
 extractor = cv2.xfeatures2d.SIFT_create()
 
 with open('VPR/images_paths.pkl', 'rb') as f:
