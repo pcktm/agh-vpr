@@ -29,7 +29,7 @@ config = {
 
 matching = Matching(config).eval().to(device)
 superpoint = matching.superpoint
-extractor = cv2.xfeatures2d.SIFT_create()
+extractor = cv2.SIFT_create()
 
 with open('VPR/images_paths.pkl', 'rb') as f:
     images_paths = pickle.load(f)
