@@ -1,14 +1,18 @@
 import torch
 import pickle
 import cv2
+import numpy as np
+import scipy.spatial.distance as metrics
 
-from VPR.models.matching import Matching
-from VPR.models.superpoint import SuperPoint
-from VPR.models.utils import read_image
-from VPR.BOVW import features, build_histogram
 from sklearn.neighbors import NearestNeighbors
+from VPR.models.matching import Matching
+from VPR.models.utils import read_image
+from VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans
+# from sklearn.neighbors import NearestNeighbors
+
 
 import crud
+# import time
 
 torch.set_grad_enabled(False)
 
@@ -29,23 +33,50 @@ config = {
 
 matching = Matching(config).eval().to(device)
 superpoint = matching.superpoint
-extractor = cv2.SIFT_create()
 
-with open('VPR/images_paths.pkl', 'rb') as f:
+with open('VPR/data/images_paths.pkl', 'rb') as f:
     images_paths = pickle.load(f)
 
-with open("VPR/preprocessed_image.pkl", "rb") as fb:
+with open("VPR/data/preprocessed_image.pkl", "rb") as fb:
     preprocessed_image = pickle.load(fb)
 
-with open('VPR/kmeans_bovw_model.pkl', 'rb') as fp:
+with open('VPR/data/kmeans_bovw_model.pkl', 'rb') as fp:
     kmeans = pickle.load(fp)
+
+with open('VPR/data/descriptors.pkl', 'rb') as fp:
+    files = pickle.load(fp)
+
+
+def bovw(img_path):
+    data = cv2.imread(f"ImgFromUser/{img_path}")
+    data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+    descriptor = features(data)
+
+    descriptors = np.concatenate([f['descriptors'] for f in files], axis=0).astype(np.float32)
+
+    kmeans = faiss_kmeans(descriptors)
+    kmeans.train(descriptors)
+
+    files_ = bow_and_tfidf(files, kmeans)
+    searched_file = {
+        "path": img_path,
+        "descriptors": descriptor}
+    searched_file = bow_and_tfidf([searched_file], kmeans)[0]
+
+    distances = {}
+    for file in files_:
+        distance = metrics.cosine(searched_file['bow'], file['bow'])
+        distances[file['path']] = distance
+
+    distances = dict(sorted(distances.items(), key=lambda x: x[1])[:20])
+    return distances.keys()
 
 
 def bag_of_vwords_search(img_name):
 
     data = cv2.imread(f"ImgFromUser/{img_name}")
     data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
-    keypoint, descriptor = features(data, extractor)
+    descriptor = features(data)
     histogram = build_histogram(descriptor, kmeans)
     neighbor = NearestNeighbors(n_neighbors=20)
     neighbor.fit(preprocessed_image)
@@ -56,14 +87,18 @@ def bag_of_vwords_search(img_name):
 
 def match(img_name):
 
-    with open('VPR/images.p', 'rb') as fp:
+    with open('VPR/data/images.p', 'rb') as fp:
         images = pickle.load(fp)
 
     image0, inp0, scales0 = read_image(f"ImgFromUser/{img_name}", device, [640, 480], 0, 1)
     pred0 = superpoint({'image': inp0})
 
+    # start = time.time()
     bag_of_vwords_search_result = bag_of_vwords_search(img_name)
     images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
+    # images_paths_ = bovw(img_name)
+    # end = time.time()
+    # print(end - start)
 
     best = []
 
@@ -83,7 +118,7 @@ def match(img_name):
         best.append((len(mkpts0), image))
 
     best.sort(key=lambda tup: tup[0], reverse=True)
-
+    print(best)
     return best
 
 
@@ -108,7 +143,7 @@ def best_match(img_name, db):
 
 def add_image_to_file(filename):
 
-    with open('VPR/images.p', 'rb') as fp:
+    with open('VPR/data/images.p', 'rb') as fp:
         images = pickle.load(fp)
 
     pred = {}
@@ -120,5 +155,8 @@ def add_image_to_file(filename):
     pred = {**pred, **{k: v for k, v in pred1.items()}}
     images[f'{filename}'] = pred
 
-    with open('VPR/images.p', 'wb') as fp:
+    with open('VPR/data/images.p', 'wb') as fp:
         pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+match('query4.jpg')

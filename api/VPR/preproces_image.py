@@ -13,7 +13,7 @@ descriptor_list = []
 images = []
 images_paths = []
 
-for image_path in glob("images/*"):
+for image_path in glob("../../../../../../../Downloads/eee/help/images/*"):
     images_paths.append(image_path)
     data = cv2.imread(image_path)
     data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
@@ -34,10 +34,10 @@ for image in images:
         preprocessed_image.append(histogram)
 
 
-with open("kmeans_bovw_model.pkl", "wb") as f:
+with open("data/kmeans_bovw_model.pkl", "wb") as f:
     pickle.dump(kmeans, f)
 
-with open("images_paths.pkl", "wb") as f:
+with open("data/images_paths.pkl", "wb") as f:
     pickle.dump(images_paths, f)
 
 extractor = cv2.xfeatures2d.SIFT_create()
@@ -52,6 +52,6 @@ for image_path in images_paths:
         histogram = build_histogram(descriptor, kmeans)
         preprocessed_image.append(histogram)
 
-with open("preprocessed_image.pkl", "wb") as f:
+with open("data/preprocessed_image.pkl", "wb") as f:
     pickle.dump(preprocessed_image, f)
 

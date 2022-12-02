@@ -21,7 +21,7 @@ superpoint = SuperPoint(config.get('superpoint', {}))
 images = {}
 pred = {}
 
-for index, filename in enumerate(glob('images/*')):
+for index, filename in enumerate(glob('../../../../../../../Downloads/eee/help/images/*')):
     image1, inp1, scales1 = read_image(filename, device, [640, 480], 0, 1)
     pred['image'] = inp1
     pred1 = superpoint({'image': inp1})
@@ -29,5 +29,5 @@ for index, filename in enumerate(glob('images/*')):
     images[f'{filename}'] = pred
 # print(images)
 
-with open('VPR/images.p', 'wb') as fp:
+with open('VPR/data/images.p', 'wb') as fp:
     pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
