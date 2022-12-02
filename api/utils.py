@@ -158,5 +158,3 @@ def add_image_to_file(filename):
     with open('VPR/data/images.p', 'wb') as fp:
         pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
-
-match('query4.jpg')
