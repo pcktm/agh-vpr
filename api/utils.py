@@ -54,14 +54,14 @@ def bovw(img_path):
 
     descriptors = np.concatenate([f['descriptors'] for f in files], axis=0).astype(np.float32)
 
-    kmeans = faiss_kmeans(descriptors)
-    kmeans.train(descriptors)
+    kmeans_ = faiss_kmeans(descriptors)
+    kmeans_.train(descriptors)
 
-    files_ = bow_and_tfidf(files, kmeans)
+    files_ = bow_and_tfidf(files, kmeans_)
     searched_file = {
         "path": img_path,
         "descriptors": descriptor}
-    searched_file = bow_and_tfidf([searched_file], kmeans)[0]
+    searched_file = bow_and_tfidf([searched_file], kmeans_)[0]
 
     distances = {}
     for file in files_:
