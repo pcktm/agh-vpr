@@ -28,7 +28,7 @@ async def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 
 
-async def create_user(db: Session, user: schemas.UserCreate):
+def create_user(db: Session, user: schemas.UserCreate):
     first_name = user.first_name
     last_name = user.last_name
     hashed_password = passlib.hash.bcrypt.hash(user.hashed_password)
@@ -95,7 +95,7 @@ def get_image_by_id(db: Session, image_id: int):
     return db.query(models.Image).filter(models.Image.id == image_id).first()
 
 
-async def add_image(db: Session, image: schemas.Image):
+async def add_image(db: Session, image: schemas.ImageCreate):
     image_name = image.image
     place_id = image.place_id
     db_image = models.Image(image=image_name, place_id=place_id)

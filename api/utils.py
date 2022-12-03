@@ -141,19 +141,19 @@ def best_match(img_name, db):
     return places
 
 
-def add_image_to_file(filename):
+def add_image_to_file(filepath):
 
     with open('VPR/data/images.p', 'rb') as fp:
         images = pickle.load(fp)
 
     pred = {}
 
-    image, inp, scales = read_image(filename, device, [640, 480], 0, 1)
+    image, inp, scales = read_image(f'VPR/{filepath}', device, [640, 480], 0, 1)
 
     pred['image'] = inp
     pred1 = superpoint({'image': inp})
     pred = {**pred, **{k: v for k, v in pred1.items()}}
-    images[f'{filename}'] = pred
+    images[f'{filepath}'] = pred
 
     with open('VPR/data/images.p', 'wb') as fp:
         pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)

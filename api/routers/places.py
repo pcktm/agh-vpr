@@ -23,12 +23,15 @@ async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db)
 
 
 @router.post("/add")
-async def add_place(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    with open(f'ImgFromUser/{file.filename}', 'wb') as buffer:
+async def add_place(user: schemas.User = Depends(crud.get_current_user), file: UploadFile = File(...), db: Session = Depends(get_db)):
+    file_path = f'images_from_user/{file.filename}'
+    with open(f'VPR/{file_path}', 'wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    add_image_to_file(file.filename)
-    # add_img_to_database
     # add_place_to_database
+    image = schemas.ImageCreate(place_id=1, image=file_path)
+    await crud.add_image(db, image)
+
+    # add_image_to_file(file_path)
     pass
 
