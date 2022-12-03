@@ -28,7 +28,7 @@ class Place(Base):
     name = Column(String, index=True)
     address = Column(String, index=True)
     description = Column(String, index=True)
-    main_image_id = Column(Integer, ForeignKey("images.id"))
+    main_image_id = Column(Integer, index=True)
 
     images = relationship("Image", back_populates="place")
     histories = relationship("History", back_populates='place')
