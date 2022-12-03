@@ -29,5 +29,5 @@ for index, filename in enumerate(glob('images/*')):
     images[f'{filename}'] = pred
 # print(images)
 
-with open('VPR/data/images.p', 'wb') as fp:
+with open('data/images.p', 'wb') as fp:
     pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
