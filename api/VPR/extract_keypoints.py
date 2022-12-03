@@ -21,7 +21,7 @@ superpoint = SuperPoint(config.get('superpoint', {}))
 images = {}
 pred = {}
 
-for index, filename in enumerate(glob('../../../../../../../Downloads/eee/help/images/*')):
+for index, filename in enumerate(glob('images/*')):
     image1, inp1, scales1 = read_image(filename, device, [640, 480], 0, 1)
     pred['image'] = inp1
     pred1 = superpoint({'image': inp1})

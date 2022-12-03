@@ -13,7 +13,7 @@ descriptor_list = []
 images = []
 images_paths = []
 
-for image_path in glob("../../../../../../../Downloads/eee/help/images/*"):
+for image_path in glob("images/*"):
     images_paths.append(image_path)
     data = cv2.imread(image_path)
     data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
