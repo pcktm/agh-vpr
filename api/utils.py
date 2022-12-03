@@ -118,7 +118,7 @@ def match(img_name):
         best.append((len(mkpts0), image))
 
     best.sort(key=lambda tup: tup[0], reverse=True)
-    print(best)
+
     return best
 
 

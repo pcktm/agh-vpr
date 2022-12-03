@@ -73,6 +73,7 @@ class PlaceCreate(PlaceBase):
 
 class Place(BaseModel):
     id: int
+    main_image_id: int
     histories: list[History] = []
 
     class Config:
