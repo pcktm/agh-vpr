@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 import datetime as dt
+import json
 
 
 class HistoryBase(BaseModel):
@@ -64,7 +65,6 @@ class PlaceBase(BaseModel):
     name: str
     address: str
     description: str
-    images: list[Image] = []
 
 
 class PlaceCreate(PlaceBase):
@@ -74,7 +74,18 @@ class PlaceCreate(PlaceBase):
 class Place(BaseModel):
     id: int
     main_image_id: int
+    images: list[Image] = []
     histories: list[History] = []
 
     class Config:
         orm_mode = True
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate_to_json
+
+    @classmethod
+    def validate_to_json(cls, value):
+        if isinstance(value, str):
+            return cls(**json.loads(value))
+        return value

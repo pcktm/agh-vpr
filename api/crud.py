@@ -84,6 +84,25 @@ def get_all_places(db: Session):
     return db.query(models.Place)
 
 
+async def add_place(db: Session, place: schemas.PlaceCreate):
+    print(place.name)
+    db_place = models.Place(name=place.name, address=place.address, description=place.description, main_image_id=0)
+
+    db.add(db_place)
+    db.commit()
+    db.refresh(db_place)
+    return db_place
+
+
+async def update_main_image_id(db: Session, place_id: int, image_id: int):
+    place = db.query(models.Place).filter(models.Place.id == place_id).first()
+    place.main_image_id = image_id
+
+    db.commit()
+    db.refresh(place)
+    return place
+
+
 # images functions
 def get_image_by_name(db: Session, image: str):
     image = db.query(models.Image).filter(models.Image.image == image).first()
