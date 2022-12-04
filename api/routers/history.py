@@ -14,8 +14,9 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[schemas.History])
-async def get_history(user: schemas.User = Depends(crud.get_current_user)):
-    return user.history
+async def get_history(user: schemas.User = Depends(crud.get_current_user),
+                      db: Session = Depends(get_db)):
+    return await crud.get_user_history(db, user.id)
 
 
 @router.get("/{history_id}")

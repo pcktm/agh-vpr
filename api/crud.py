@@ -1,13 +1,12 @@
-# TODO: def delete_from_history()
 # TODO: def delete_user()
-# TODO: def clear_user_history()
-# etc...
+
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
 from database import get_db
 
 import passlib.hash
 import fastapi.security
+from datetime import datetime
 import jwt
 
 import models
@@ -83,7 +82,7 @@ def get_all_places(db: Session):
     return db.query(models.Place)
 
 
-async def add_place(db: Session, place: schemas.PlaceCreate):
+async def create_place(db: Session, place: schemas.PlaceCreate):
     print(place.name)
     db_place = models.Place(name=place.name, address=place.address, description=place.description, main_image_id=0)
 
@@ -126,7 +125,9 @@ async def add_image(db: Session, image: schemas.ImageCreate):
 
 # history functions
 async def get_user_history(db: Session, user_id: int):
-    return db.query(models.History).filter(models.History.user_id == user_id)
+    history = db.query(models.History).filter(models.History.user_id == user_id)
+
+    return list(map(schemas.History.from_orm, history))
 
 
 async def history_selector(history_id: int, user: schemas.User, db: Session):
@@ -160,3 +161,14 @@ async def delete_user_history(db: Session, user: schemas.User):
     for history in user_history:
         db.delete(history)
         db.commit()
+
+
+async def add_to_history(db: Session, user: schemas.User, place_id: int):
+    date = datetime.now()
+
+    db_history = models.History(place_id=place_id, user_id=user.id, date=date)
+    db.add(db_history)
+    db.commit()
+    db.refresh(db_history)
+
+    return db_history

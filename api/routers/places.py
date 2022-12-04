@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 import shutil
 import cv2
@@ -26,11 +28,21 @@ async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db)
     return places
 
 
-@router.post("/add")
-async def add_place(place: schemas.PlaceCreate = Depends(), file: UploadFile = File(...), db: Session = Depends(get_db),
+@router.post("/find/{place_id}")
+async def add_place_to_history(place_id: int,
+                               user: schemas.User = Depends(crud.get_current_user),
+                               db: Session = Depends(get_db)):
+    await crud.add_to_history(db, user, place_id)
+
+    return {"message", "Successfully added to history"}
+
+
+@router.post("/create")
+async def create_place(place: schemas.PlaceCreate = Depends(),
+                    file: UploadFile = File(...), db: Session = Depends(get_db),
                     user: schemas.User = Depends(crud.get_current_user)):
 
-    db_place = await crud.add_place(db, place)
+    db_place = await crud.create_place(db, place)
 
     file_path = f'images_from_user/{file.filename}'
     with open(f'VPR/{file_path}', 'wb') as buffer:
@@ -41,5 +53,5 @@ async def add_place(place: schemas.PlaceCreate = Depends(), file: UploadFile = F
     await crud.update_main_image_id(db, db_place.id, db_image.id)
 
     # add_image_to_file(file_path)
-    return "image successfully added ;)"
+    return {"message", "Place successfully added ;)"}
 

@@ -136,9 +136,11 @@ def best_match(image_, db):
         try:
             place_id = crud.get_image_by_name(db, image_name).place_id
             place = crud.get_place(db, place_id)
-            place_details = (place.name, place.address, place.description)
-            if place_details not in places:
-                places.append(place_details)
+            # place_details = (place.name, place.address, place.description)
+            # if place_details not in places:
+            #     places.append(place_details)
+            if place not in places:
+                places.append(place)
             # places[place.name] = {place.address, place.description}
         except:
             pass
