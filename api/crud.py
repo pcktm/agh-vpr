@@ -30,7 +30,7 @@ async def get_user_by_email(db: Session, email: str):
 def create_user(db: Session, user: schemas.UserCreate):
     first_name = user.first_name
     last_name = user.last_name
-    hashed_password = passlib.hash.bcrypt.hash(user.hashed_password)
+    hashed_password = passlib.hash.bcrypt.hash(user.password)
     db_user = models.User(email=user.email, hashed_password=hashed_password, first_name=first_name,
                           last_name=last_name)
     db.add(db_user)

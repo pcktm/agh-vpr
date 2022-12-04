@@ -57,7 +57,7 @@ def bovw(data):
 
     files_ = bow_and_tfidf(files, kmeans_)
 
-    searched_file = {"path": img_path, "descriptors": descriptor}
+    searched_file = {"path": 'image_from_user', "descriptors": descriptor}
 
     searched_file = bow_and_tfidf([searched_file], kmeans_)[0]
 
@@ -91,7 +91,6 @@ def match(img_raw):
 
     # start = time.time()
     bag_of_vwords_search_result = bag_of_vwords_search(img_raw)
-
     images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
     # images_paths_ = bovw(image_)
     # end = time.time()
