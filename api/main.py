@@ -27,9 +27,6 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-path = "ImgFromUser"
-if not os.path.exists(path):
-    os.mkdir(path)
 path = "VPR/images_from_user"
 if not os.path.exists(path):
     os.mkdir(path)

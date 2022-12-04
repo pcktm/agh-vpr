@@ -1,5 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Depends, Form
 import shutil
+import cv2
+import numpy as np
 from sqlalchemy.orm import Session
 from utils import best_match, add_image_to_file
 
@@ -15,9 +17,8 @@ router = APIRouter(
 
 @router.post("/find")
 async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    with open(f'ImgFromUser/{file.filename}', 'wb') as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    places = best_match(file.filename, db)
+    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    places = best_match(image, db)
 
     return places
 

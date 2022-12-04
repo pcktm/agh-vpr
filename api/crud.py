@@ -1,4 +1,3 @@
-# TODO: def add_place()
 # TODO: def delete_from_history()
 # TODO: def delete_user()
 # TODO: def clear_user_history()

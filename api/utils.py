@@ -1,6 +1,5 @@
 import torch
 import pickle
-import cv2
 import numpy as np
 import scipy.spatial.distance as metrics
 
@@ -9,7 +8,6 @@ from VPR.models.matching import Matching
 from VPR.models.utils import read_image
 from VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans
 # from sklearn.neighbors import NearestNeighbors
-
 
 import crud
 # import time
@@ -47,9 +45,7 @@ with open('VPR/data/descriptors.pkl', 'rb') as fp:
     files = pickle.load(fp)
 
 
-def bovw(img_path):
-    data = cv2.imread(f"ImgFromUser/{img_path}")
-    data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+def bovw(data):
     descriptor = features(data)
 
     descriptors = np.concatenate([f['descriptors'] for f in files], axis=0).astype(np.float32)
@@ -59,8 +55,9 @@ def bovw(img_path):
 
     files_ = bow_and_tfidf(files, kmeans_)
     searched_file = {
-        "path": img_path,
-        "descriptors": descriptor}
+        "path": 'image_from_user',
+        "descriptors": descriptor
+    }
     searched_file = bow_and_tfidf([searched_file], kmeans_)[0]
 
     distances = {}
@@ -72,11 +69,9 @@ def bovw(img_path):
     return distances.keys()
 
 
-def bag_of_vwords_search(img_name):
+def bag_of_vwords_search(image_):
 
-    data = cv2.imread(f"ImgFromUser/{img_name}")
-    data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
-    descriptor = features(data)
+    descriptor = features(image_)
     histogram = build_histogram(descriptor, kmeans)
     neighbor = NearestNeighbors(n_neighbors=20)
     neighbor.fit(preprocessed_image)
@@ -85,18 +80,18 @@ def bag_of_vwords_search(img_name):
     return result[0]
 
 
-def match(img_name):
+def match(image_):
 
     with open('VPR/data/images.p', 'rb') as fp:
         images = pickle.load(fp)
 
-    image0, inp0, scales0 = read_image(f"ImgFromUser/{img_name}", device, [640, 480], 0, 1)
+    image0, inp0, scales0 = read_image(image_, device, [640, 480], 0, 1)
     pred0 = superpoint({'image': inp0})
 
     # start = time.time()
-    bag_of_vwords_search_result = bag_of_vwords_search(img_name)
+    bag_of_vwords_search_result = bag_of_vwords_search(image_)
     images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
-    # images_paths_ = bovw(img_name)
+    # images_paths_ = bovw(image_)
     # end = time.time()
     # print(end - start)
 
@@ -122,8 +117,8 @@ def match(img_name):
     return best
 
 
-def best_match(img_name, db):
-    best = match(img_name)
+def best_match(image_, db):
+    best = match(image_)
 
     # places = {}
     places = []
