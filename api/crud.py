@@ -145,3 +145,18 @@ async def history_selector(history_id: int, user: schemas.User, db: Session):
 
 async def get_history_entity(db: Session, user: schemas.User, history_id: int):
     return await history_selector(history_id, user, db)
+
+
+async def delete_from_history(db: Session, user: schemas.User, history_id: int):
+    db_history = await history_selector(history_id, user, db)
+
+    db.delete(db_history)
+    db.commit()
+
+
+async def delete_user_history(db: Session, user: schemas.User):
+    user_history = db.query(models.History).filter_by(user_id=user.id)
+
+    for history in user_history:
+        db.delete(history)
+        db.commit()
