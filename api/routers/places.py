@@ -1,5 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Depends, Form
 import shutil
+import cv2
+import numpy as np
 from sqlalchemy.orm import Session
 from utils import best_match, add_image_to_file
 import cv2

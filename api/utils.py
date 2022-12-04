@@ -1,6 +1,5 @@
 import torch
 import pickle
-import cv2
 import numpy as np
 import scipy.spatial.distance as metrics
 
@@ -47,9 +46,7 @@ with open('VPR/data/descriptors.pkl', 'rb') as fp:
     files = pickle.load(fp)
 
 
-def bovw(img_path):
-    data = cv2.imread(f"ImgFromUser/{img_path}")
-    data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+def bovw(data):
     descriptor = features(data)
 
     descriptors = np.concatenate([f['descriptors'] for f in files],
@@ -59,7 +56,9 @@ def bovw(img_path):
     kmeans_.train(descriptors)
 
     files_ = bow_and_tfidf(files, kmeans_)
+
     searched_file = {"path": img_path, "descriptors": descriptor}
+
     searched_file = bow_and_tfidf([searched_file], kmeans_)[0]
 
     distances = {}
@@ -71,9 +70,9 @@ def bovw(img_path):
     return distances.keys()
 
 
-def bag_of_vwords_search(image):
-    data = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    descriptor = features(data)
+def bag_of_vwords_search(image_):
+
+    descriptor = features(image_)
     histogram = build_histogram(descriptor, kmeans)
     neighbor = NearestNeighbors(n_neighbors=20)
     neighbor.fit(preprocessed_image)
@@ -92,8 +91,9 @@ def match(img_raw):
 
     # start = time.time()
     bag_of_vwords_search_result = bag_of_vwords_search(img_raw)
+
     images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
-    # images_paths_ = bovw(img_name)
+    # images_paths_ = bovw(image_)
     # end = time.time()
     # print(end - start)
 
@@ -127,8 +127,8 @@ def match(img_raw):
     return best
 
 
-def best_match(image, db):
-    best = match(image)
+def best_match(image_, db):
+    best = match(image_)
 
     # places = {}
     places = []
