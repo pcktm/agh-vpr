@@ -1,4 +1,4 @@
-# import uvicorn
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -36,5 +36,6 @@ if not os.path.exists(path):
 
 app.include_router(places_routers)
 app.include_router(users_routers)
-# uvicorn.run(app, host="127.0.0.1", port=5000, log_level="info")
 
+if __name__ == '__main__':
+    uvicorn.run(app, host="0.0.0.0", port=8000)

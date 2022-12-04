@@ -10,13 +10,13 @@ from VPR.models.utils import read_image
 from VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans
 # from sklearn.neighbors import NearestNeighbors
 
-
 import crud
 # import time
 
 torch.set_grad_enabled(False)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f'Using device {device}')
 
 config = {
     'superpoint': {
@@ -32,7 +32,7 @@ config = {
 }
 
 matching = Matching(config).eval().to(device)
-superpoint = matching.superpoint
+superpoint = matching.superpoint.to(device)
 
 with open('VPR/data/images_paths.pkl', 'rb') as f:
     images_paths = pickle.load(f)
@@ -52,15 +52,14 @@ def bovw(img_path):
     data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
     descriptor = features(data)
 
-    descriptors = np.concatenate([f['descriptors'] for f in files], axis=0).astype(np.float32)
+    descriptors = np.concatenate([f['descriptors'] for f in files],
+                                 axis=0).astype(np.float32)
 
     kmeans_ = faiss_kmeans(descriptors)
     kmeans_.train(descriptors)
 
     files_ = bow_and_tfidf(files, kmeans_)
-    searched_file = {
-        "path": img_path,
-        "descriptors": descriptor}
+    searched_file = {"path": img_path, "descriptors": descriptor}
     searched_file = bow_and_tfidf([searched_file], kmeans_)[0]
 
     distances = {}
@@ -72,10 +71,8 @@ def bovw(img_path):
     return distances.keys()
 
 
-def bag_of_vwords_search(img_name):
-
-    data = cv2.imread(f"ImgFromUser/{img_name}")
-    data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+def bag_of_vwords_search(image):
+    data = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     descriptor = features(data)
     histogram = build_histogram(descriptor, kmeans)
     neighbor = NearestNeighbors(n_neighbors=20)
@@ -85,16 +82,16 @@ def bag_of_vwords_search(img_name):
     return result[0]
 
 
-def match(img_name):
+def match(img_raw):
 
     with open('VPR/data/images.p', 'rb') as fp:
         images = pickle.load(fp)
 
-    image0, inp0, scales0 = read_image(f"ImgFromUser/{img_name}", device, [640, 480], 0, 1)
+    image0, inp0, scales0 = read_image(img_raw, device, [640, 480], 0, 1)
     pred0 = superpoint({'image': inp0})
 
     # start = time.time()
-    bag_of_vwords_search_result = bag_of_vwords_search(img_name)
+    bag_of_vwords_search_result = bag_of_vwords_search(img_raw)
     images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
     # images_paths_ = bovw(img_name)
     # end = time.time()
@@ -103,11 +100,19 @@ def match(img_name):
     best = []
 
     for image in images_paths_:
-        pred1 = {}
-        pred1['image0'] = inp0
-        pred1 = {**pred1, **{k + '0': v for k, v in pred0.items()}}
-        pred1 = {**pred1, **{k + '1': v for k, v in images[image].items()}}
-        pred = matching(pred1)
+
+        inp1 = images[image]
+
+        pred = matching({
+            'image0': inp0,
+            'keypoints0': pred0['keypoints'],
+            'descriptors0': pred0['descriptors'],
+            'scores0': pred0['scores'],
+            'image1': inp1['image'],
+            'keypoints1': inp1['keypoints'],
+            'descriptors1': inp1['descriptors'],
+            'scores1': inp1['scores'],
+        })
         pred = {k: v[0].cpu().numpy() for k, v in pred.items()}
         kpts0, kpts1 = pred['keypoints0'], pred['keypoints1']
         matches, conf = pred['matches0'], pred['matching_scores0']
@@ -122,8 +127,8 @@ def match(img_name):
     return best
 
 
-def best_match(img_name, db):
-    best = match(img_name)
+def best_match(image, db):
+    best = match(image)
 
     # places = {}
     places = []
@@ -148,13 +153,13 @@ def add_image_to_file(filepath):
 
     pred = {}
 
-    image, inp, scales = read_image(f'VPR/{filepath}', device, [640, 480], 0, 1)
+    image, inp, scales = read_image(f'VPR/{filepath}', device, [640, 480], 0,
+                                    1)
 
     pred['image'] = inp
     pred1 = superpoint({'image': inp})
-    pred = {**pred, **{k: v for k, v in pred1.items()}}
+    pred = {**pred, **{k: v[0].cpu().numpy() for k, v in pred1.items()}}
     images[f'{filepath}'] = pred
 
     with open('VPR/data/images.p', 'wb') as fp:
         pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
-
