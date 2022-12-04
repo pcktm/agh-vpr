@@ -260,8 +260,8 @@ def frame2tensor(frame, device):
     return torch.from_numpy(frame/255.).float()[None, None].to(device)
 
 
-def read_image(image, device, resize, rotation, resize_float):
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def read_image(img_raw, device, resize, rotation, resize_float):
+    image = cv2.cvtColor(img_raw, cv2.COLOR_BGR2GRAY)
     if image is None:
         return None, None, None
     w, h = image.shape[1], image.shape[0]
