@@ -6,6 +6,7 @@ from models import Base
 from database import engine, get_db
 from routers.places import router as places_routers
 from routers.users import router as users_routers
+from routers.history import router as history_routers
 import os
 
 Base.metadata.create_all(bind=engine)
@@ -33,6 +34,7 @@ if not os.path.exists(path):
 
 app.include_router(places_routers)
 app.include_router(users_routers)
+app.include_router(history_routers)
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)

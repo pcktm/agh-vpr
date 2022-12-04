@@ -92,7 +92,7 @@ def match(img_raw):
     # start = time.time()
     bag_of_vwords_search_result = bag_of_vwords_search(img_raw)
     images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
-    # images_paths_ = bovw(image_)
+    # images_paths_ = bovw(img_raw)
     # end = time.time()
     # print(end - start)
 

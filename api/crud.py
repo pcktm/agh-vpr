@@ -128,3 +128,20 @@ async def add_image(db: Session, image: schemas.ImageCreate):
 async def get_user_history(db: Session, user_id: int):
     return db.query(models.History).filter(models.History.user_id == user_id)
 
+
+async def history_selector(history_id: int, user: schemas.User, db: Session):
+    history = (
+        db.query(models.History)
+        .filter_by(user_id=user.id)
+        .filter(models.History.id == history_id)
+        .first()
+    )
+
+    if history is None:
+        raise HTTPException(status_code=404, detail="This place does not exist in history.")
+
+    return history
+
+
+async def get_history_entity(db: Session, user: schemas.User, history_id: int):
+    return await history_selector(history_id, user, db)
