@@ -36,6 +36,6 @@ async def add_place(place: schemas.PlaceCreate = Depends(), file: UploadFile = F
     db_image = await crud.add_image(db, image)
     await crud.update_main_image_id(db, db_place.id, db_image.id)
 
-    add_image_to_file(file_path)
-    return
+    # add_image_to_file(file_path)
+    return "image successfully added ;)"
 
