@@ -1,5 +1,6 @@
 import torch
 import pickle
+import cv2
 import numpy as np
 import scipy.spatial.distance as metrics
 
@@ -136,11 +137,13 @@ def best_match(image_, db):
         try:
             place_id = crud.get_image_by_name(db, image_name).place_id
             place = crud.get_place(db, place_id)
-            # place_details = (place.name, place.address, place.description)
-            # if place_details not in places:
-            #     places.append(place_details)
-            if place not in places:
-                places.append(place)
+            main_img = crud.get_image_by_id(db, place.main_image_id).image
+            filepath = "/static/" + main_img
+            place_details = (place.name, place.address, place.description, filepath)
+            if place_details not in places:
+                places.append(place_details)
+            # if place not in places:
+            #     places.append(place)
             # places[place.name] = {place.address, place.description}
         except:
             pass
@@ -153,9 +156,8 @@ def add_image_to_file(filepath):
         images = pickle.load(fp)
 
     pred = {}
-
-    image, inp, scales = read_image(f'VPR/{filepath}', device, [640, 480], 0,
-                                    1)
+    img_raw = cv2.imread(f"VPR/images/{filepath}")
+    image, inp, scales = read_image(img_raw, device, [640, 480], 0, 1)
 
     pred['image'] = inp
     pred1 = superpoint({'image': inp})
@@ -164,3 +166,4 @@ def add_image_to_file(filepath):
 
     with open('VPR/data/images.p', 'wb') as fp:
         pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
+

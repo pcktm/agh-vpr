@@ -108,6 +108,10 @@ def get_image_by_name(db: Session, image: str):
     return image
 
 
+def get_number_of_images(db: Session):
+    return db.query(models.Image).count()
+
+
 def get_image_by_id(db: Session, image_id: int):
     return db.query(models.Image).filter(models.Image.id == image_id).first()
 
