@@ -4,14 +4,15 @@ import cv2
 import numpy as np
 import scipy.spatial.distance as metrics
 
-from sklearn.neighbors import NearestNeighbors
+# from sklearn.neighbors import NearestNeighbors
 from VPR.models.matching import Matching
 from VPR.models.utils import read_image
-from VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans
-# from sklearn.neighbors import NearestNeighbors
+from VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans, calculate_descriptors
+from sklearn.neighbors import NearestNeighbors
+from glob import glob
 
 import crud
-# import time
+import time
 
 torch.set_grad_enabled(False)
 
@@ -34,20 +35,21 @@ config = {
 matching = Matching(config).eval().to(device)
 superpoint = matching.superpoint.to(device)
 
-with open('VPR/data/images_paths.pkl', 'rb') as f:
-    images_paths = pickle.load(f)
-
-with open("VPR/data/preprocessed_image.pkl", "rb") as fb:
-    preprocessed_image = pickle.load(fb)
-
-with open('VPR/data/kmeans_bovw_model.pkl', 'rb') as fp:
-    kmeans = pickle.load(fp)
-
-with open('VPR/data/descriptors.pkl', 'rb') as fp:
-    files = pickle.load(fp)
+# with open('VPR/data/images_paths.pkl', 'rb') as f:
+#     images_paths = pickle.load(f)
+#
+# with open("VPR/data/preprocessed_image.pkl", "rb") as fb:
+#     preprocessed_image = pickle.load(fb)
+#
+# with open('VPR/data/kmeans_bovw_model.pkl', 'rb') as fp:
+#     kmeans = pickle.load(fp)
 
 
 def bovw(data):
+
+    with open('VPR/data/descriptors.pkl', 'rb') as fp:
+        files = pickle.load(fp)
+
     descriptor = features(data)
 
     descriptors = np.concatenate([f['descriptors'] for f in files],
@@ -71,15 +73,15 @@ def bovw(data):
     return distances.keys()
 
 
-def bag_of_vwords_search(image_):
-
-    descriptor = features(image_)
-    histogram = build_histogram(descriptor, kmeans)
-    neighbor = NearestNeighbors(n_neighbors=20)
-    neighbor.fit(preprocessed_image)
-    dist, result = neighbor.kneighbors([histogram])
-
-    return result[0]
+# def bag_of_vwords_search(image_):
+#
+#     descriptor = features(image_)
+#     histogram = build_histogram(descriptor, kmeans)
+#     neighbor = NearestNeighbors(n_neighbors=20)
+#     neighbor.fit(preprocessed_image)
+#     dist, result = neighbor.kneighbors([histogram])
+#
+#     return result[0]
 
 
 def match(img_raw):
@@ -91,9 +93,9 @@ def match(img_raw):
     pred0 = superpoint({'image': inp0})
 
     # start = time.time()
-    bag_of_vwords_search_result = bag_of_vwords_search(img_raw)
-    images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
-    # images_paths_ = bovw(img_raw)
+    # bag_of_vwords_search_result = bag_of_vwords_search(img_raw)
+    # images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
+    images_paths_ = bovw(img_raw)
     # end = time.time()
     # print(end - start)
 
@@ -161,10 +163,11 @@ def add_image_to_file(filepath):
 
     pred1 = superpoint({'image': inp1})
 
-    batch = {**pred1, **{k: v for k, v in pred1.items()}}
+    batch = {**pred1, **{k: v for k, v in pred1.items()}, 'image': inp1}
 
     images[f'{filepath}'] = batch
 
+    calculate_descriptors("VPR/images/*", "VPR/images_from_user/*", "VPR/data/descriptors.pkl")
+
     with open('VPR/data/images.p', 'wb') as fp:
         pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
-

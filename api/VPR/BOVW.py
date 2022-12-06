@@ -1,17 +1,23 @@
 import numpy as np
+import pickle
 import cv2
 import faiss
+import os
+from multiprocessing import Pool
+from glob import glob
 
 
 def features(image):
     extractor = cv2.SIFT_create()
-    keypoints, descriptors = extractor.detectAndCompute(image, None)
+    _, descriptors = extractor.detectAndCompute(image, None)
     return descriptors
 
 
 def multiprocessing_child(img_path):
-    img = cv2.imread(img_path)
+    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     des = features(img)
+    if img_path.startswith('VPR/'):
+        img_path = img_path[4:]
     return {
         "path": img_path,
         "descriptors": des
@@ -65,3 +71,23 @@ def faiss_kmeans(descriptors):
                         nredo=3,
                         verbose=True,
                         gpu=True)
+
+
+def calculate_descriptors(path1, path2, path3):
+
+    queue1 = glob(path1)
+    queue2 = glob(path2)
+    queue = queue1 + queue2
+
+    results = []
+    # if process argument is not given
+    with Pool(processes=20) as pool:
+        promises = pool.imap_unordered(multiprocessing_child,
+                                       queue,
+                                       chunksize=100)
+        for promise in promises:
+            results.append(promise)
+            print(f"Processed {len(results)} / {len(queue)} images")
+
+    with open(path3, "wb") as f:
+        pickle.dump(results, f)

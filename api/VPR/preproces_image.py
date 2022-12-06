@@ -10,10 +10,12 @@ from BOVW import features, build_histogram, vstack_descriptors
 
 descriptor_list = []
 images = []
-images_paths = []
 
-for image_path in glob("images/*"):
-    images_paths.append(image_path)
+images_paths1 = glob("images/*")
+images_paths2 = glob("images_from_user/*")
+images_paths = images_paths1 + images_paths2
+
+for image_path in images_paths:
     data = cv2.imread(image_path)
     data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
     images.append(data)

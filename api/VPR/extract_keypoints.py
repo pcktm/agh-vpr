@@ -5,6 +5,7 @@ import cv2
 from glob import glob
 from models.superpoint import SuperPoint
 from models.utils import read_image
+from BOVW import calculate_descriptors
 
 
 def extract_keypoints(list_files):
@@ -33,7 +34,7 @@ def extract_keypoints(list_files):
 
         pred1 = superpoint({'image': inp1})
 
-        batch = {**pred1, **{k: v for k, v in pred1.items()}}
+        batch = {**pred1, **{k: v for k, v in pred1.items()}, 'image': inp1}
 
         images[f'{filename}'] = batch
 
@@ -42,10 +43,13 @@ def extract_keypoints(list_files):
     return images
 
 
-files_from_database = [x for x in glob("images/*")]
-files_from_user = [x for x in glob("images_from_user/*")]
-files = files_from_database + files_from_user
-images = extract_keypoints(files)
+if __name__ == '__main__':
+    files_from_database = glob("images/*")
+    files_from_user = glob("images_from_user/*")
+    files = files_from_database + files_from_user
+    images = extract_keypoints(files)
 
-with open('data/images.p', 'wb') as fp:
-    pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
+    calculate_descriptors("images/*", "images_from_user/*", "data/descriptors.pkl")
+
+    with open('data/images.p', 'wb') as fp:
+        pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)

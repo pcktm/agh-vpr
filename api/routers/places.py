@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi import BackgroundTasks, APIRouter, UploadFile, File, Depends, HTTPException
 import shutil
 import cv2
 import numpy as np
@@ -36,9 +36,10 @@ async def add_place_to_history(place_id: int,
 
 
 @router.post("/create")
-async def create_place(place: schemas.PlaceCreate = Depends(),
-                    file: UploadFile = File(...), db: Session = Depends(get_db),
-                    user: schemas.User = Depends(crud.get_current_user)):
+async def create_place(background_tasks: BackgroundTasks,
+                       place: schemas.PlaceCreate = Depends(),
+                       file: UploadFile = File(...), db: Session = Depends(get_db),
+                       user: schemas.User = Depends(crud.get_current_user)):
 
     db_place = await crud.create_place(db, place)
     n = crud.get_number_of_images(db) + 1
@@ -51,6 +52,6 @@ async def create_place(place: schemas.PlaceCreate = Depends(),
     db_image = await crud.add_image(db, image)
     await crud.update_main_image_id(db, db_place.id, db_image.id)
 
-    add_image_to_file(file_path)
+    background_tasks.add_task(add_image_to_file(file_path))
     return {"message", "Place successfully added ;)"}
 
