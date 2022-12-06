@@ -44,7 +44,7 @@ async def create_place(place: schemas.PlaceCreate = Depends(),
     n = crud.get_number_of_images(db) + 1
 
     file_path = f'images_from_user/image{n}.png'
-    with open(f'VPR/images/{file_path}', 'wb') as buffer:
+    with open(f'VPR/{file_path}', 'wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     image = schemas.ImageCreate(place_id=db_place.id, image=file_path)

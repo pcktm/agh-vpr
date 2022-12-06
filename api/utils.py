@@ -139,7 +139,7 @@ def best_match(image_, db):
             place = crud.get_place(db, place_id)
             main_img = crud.get_image_by_id(db, place.main_image_id).image
             filepath = "/static/" + main_img
-            place_details = (place.name, place.address, place.description, filepath)
+            place_details = (place.name, place.address, place.description, filepath, place.id)
             if place_details not in places:
                 places.append(place_details)
             # if place not in places:
@@ -155,14 +155,15 @@ def add_image_to_file(filepath):
     with open('VPR/data/images.p', 'rb') as fp:
         images = pickle.load(fp)
 
-    pred = {}
-    img_raw = cv2.imread(f"VPR/images/{filepath}")
-    image, inp, scales = read_image(img_raw, device, [640, 480], 0, 1)
+    image = cv2.imread(f"VPR/{filepath}")
 
-    pred['image'] = inp
-    pred1 = superpoint({'image': inp})
-    pred = {**pred, **{k: v[0].cpu().numpy() for k, v in pred1.items()}}
-    images[f'{filepath}'] = pred
+    image1, inp1, scales1 = read_image(image, device, [640, 480], 0, 1)
+
+    pred1 = superpoint({'image': inp1})
+
+    batch = {**pred1, **{k: v for k, v in pred1.items()}}
+
+    images[f'{filepath}'] = batch
 
     with open('VPR/data/images.p', 'wb') as fp:
         pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
