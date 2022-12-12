@@ -5,6 +5,7 @@ import cv2
 from glob import glob
 from models.superpoint import SuperPoint
 from models.utils import read_image
+from preproces_image import calculate_kmeans, preproces_images
 from BOVW import calculate_descriptors
 
 
@@ -49,7 +50,14 @@ if __name__ == '__main__':
     files = files_from_database + files_from_user
     images = extract_keypoints(files)
 
-    calculate_descriptors("images/*", "images_from_user/*", "data/descriptors.pkl")
+    # calculate_descriptors("images/*", "images_from_user/*", "data/descriptors.pkl")
 
     with open('data/images.pth', 'wb') as fp:
         torch.save(images, fp)
+
+    kmeans, images = calculate_kmeans()
+    preproces_images(images, kmeans)
+    
+    with open("data/kmeans_bovw_model.pkl", "wb") as f:
+        pickle.dump(kmeans, f)
+
