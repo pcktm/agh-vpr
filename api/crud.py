@@ -82,8 +82,26 @@ def get_all_places(db: Session):
     return db.query(models.Place)
 
 
+def exist_by_name(db: Session, place_name):
+    place = db.query(models.Place).filter(models.Place.name == place_name).first()
+
+    if place is None:
+        return False
+
+    return True
+
+
+def exist_by_address(db: Session, place_address):
+    place = db.query(models.Place).filter(models.Place.address == place_address).first()
+
+    if place is None:
+        return False
+
+    return True
+
+
 async def create_place(db: Session, place: schemas.PlaceCreate):
-    print(place.name)
+    # print(place.name)
     db_place = models.Place(name=place.name, address=place.address, description=place.description, main_image_id=0)
 
     db.add(db_place)
@@ -176,3 +194,4 @@ async def add_to_history(db: Session, user: schemas.User, place_id: int):
     db.refresh(db_history)
 
     return db_history
+

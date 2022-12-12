@@ -41,17 +41,20 @@ async def create_place(background_tasks: BackgroundTasks,
                        file: UploadFile = File(...), db: Session = Depends(get_db),
                        user: schemas.User = Depends(crud.get_current_user)):
 
-    db_place = await crud.create_place(db, place)
-    n = crud.get_number_of_images(db) + 1
+    if not crud.exist_by_name(db, place.name) and not crud.exist_by_address(db, place.address):
+        db_place = await crud.create_place(db, place)
+        n = crud.get_number_of_images(db) + 1
 
-    file_path = f'images_from_user/image{n}.png'
-    with open(f'VPR/{file_path}', 'wb') as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        file_path = f'images_from_user/image{n}.png'
+        with open(f'VPR/{file_path}', 'wb') as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
-    image = schemas.ImageCreate(place_id=db_place.id, image=file_path)
-    db_image = await crud.add_image(db, image)
-    await crud.update_main_image_id(db, db_place.id, db_image.id)
+        image = schemas.ImageCreate(place_id=db_place.id, image=file_path)
+        db_image = await crud.add_image(db, image)
+        await crud.update_main_image_id(db, db_place.id, db_image.id)
 
-    background_tasks.add_task(add_image_to_file(file_path))
-    return {"message", "Place successfully added ;)"}
+        background_tasks.add_task(add_image_to_file(file_path))
 
+        return {"message", "Place successfully added ;)"}
+    else:
+        return {"message", "Place already exists in database"}
