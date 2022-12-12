@@ -67,8 +67,8 @@ def bow_and_tfidf(files, kmeans):
 def faiss_kmeans(descriptors):
     return faiss.Kmeans(descriptors.shape[1],
                         175,
-                        niter=200,
-                        nredo=3,
+                        niter=150,
+                        nredo=1,
                         verbose=True,
                         gpu=True)
 

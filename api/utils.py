@@ -86,8 +86,8 @@ def bovw(data):
 
 def match(img_raw):
 
-    with open('VPR/data/images.p', 'rb') as fp:
-        images = pickle.load(fp)
+    with open('VPR/data/images.pth', 'rb') as fp:
+        images = torch.load(fp)
 
     image0, inp0, scales0 = read_image(img_raw, device, [640, 480], 0, 1)
     pred0 = superpoint({'image': inp0})
@@ -106,7 +106,7 @@ def match(img_raw):
         inp1 = images[image]
 
         pred = matching({
-            'image0': inp0,
+            'image0': inp0.to(device),
             'keypoints0': pred0['keypoints'],
             'descriptors0': pred0['descriptors'],
             'scores0': pred0['scores'],

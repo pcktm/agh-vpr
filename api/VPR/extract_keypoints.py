@@ -51,5 +51,5 @@ if __name__ == '__main__':
 
     calculate_descriptors("images/*", "images_from_user/*", "data/descriptors.pkl")
 
-    with open('data/images.p', 'wb') as fp:
-        pickle.dump(images, fp, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('data/images.pth', 'wb') as fp:
+        torch.save(images, fp)
