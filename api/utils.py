@@ -152,7 +152,7 @@ def best_match(image_, db):
     return places
 
 
-def add_image_to_file(filepath):
+def add_image_to_file(filepath, image):
 
     with open('VPR/data/images.pth', 'rb') as fp:
         images = torch.load(fp)
@@ -163,7 +163,6 @@ def add_image_to_file(filepath):
     with open('VPR/data/images_paths.pkl', 'rb') as f:
         images_paths = pickle.load(f)
 
-    image = cv2.imread(f"VPR/{filepath}")
 
     image1, inp1, scales1 = read_image(image, device, [640, 480], 0, 1)
 
