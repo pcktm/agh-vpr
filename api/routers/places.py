@@ -16,9 +16,9 @@ router = APIRouter(
 
 @router.post("/find")
 async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    try:
-        image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
-    except:
+
+    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
     places = best_match(image, db)
 
@@ -39,9 +39,9 @@ async def create_place(background_tasks: BackgroundTasks,
                        place: schemas.PlaceCreate = Depends(),
                        file: UploadFile = File(...), db: Session = Depends(get_db),
                        user: schemas.User = Depends(crud.get_current_user)):
-    try:
-        image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
-    except:
+
+    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
 
     if not crud.exist_by_name(db, place.name) and not crud.exist_by_address(db, place.address):
