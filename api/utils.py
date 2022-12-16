@@ -10,6 +10,7 @@ from VPR.models.utils import read_image
 from VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans, calculate_descriptors
 # from sklearn.neighbors import NearestNeighbors
 from glob import glob
+from copy import deepcopy
 
 import crud
 import time
@@ -132,21 +133,25 @@ def match(img_raw):
 def best_match(image_, db):
     best = match(image_)
 
-    # places = {}
     places = []
+    places_db = []
     for image in best:
         image_name = image[1]
         try:
             place_id = crud.get_image_by_name(db, image_name).place_id
-            place = crud.get_place(db, place_id)
-            main_img = crud.get_image_by_id(db, place.main_image_id).image
-            filepath = "/static/" + main_img
-            place_details = (place.name, place.address, place.description, filepath, place.id)
-            if place_details not in places:
-                places.append(place_details)
-            # if place not in places:
-            #     places.append(place)
-            # places[place.name] = {place.address, place.description}
+            place_db = crud.get_place(db, place_id)
+            if place_db not in places_db:
+                places_db.append(place_db)
+
+                main_img = crud.get_image_by_id(db, place_db.main_image_id).image
+                filepath = "/static/" + main_img
+                place = deepcopy(place_db)
+                place = place.__dict__
+                place.pop("main_image_id")
+                place["main_image"] = filepath
+
+                if place not in places:
+                    places.append(place)
         except:
             pass
     return places
