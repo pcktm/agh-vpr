@@ -3,6 +3,7 @@ import axios from 'axios';
 import PhotoCaptureInput from './PhotoCaptureInput';
 import {SearchResults} from '../types';
 import SearchResultsDisplay from './SearchResultsDisplay';
+import styles from '../styles/hero.module.scss';
 
 export default function Hero() {
   const [isSearching, setSearching] = useState(false);
@@ -30,14 +31,14 @@ export default function Hero() {
   };
 
   return (
-    <div className="min-h-screen p-2 flex flex-col md:justify-center border-b border-stone-400 rounded-b-xl backdrop-blur">
-      <div className="flex flex-col xl:flex-row">
-        <div className="m-1 overflow-hidden p-4 xl:w-2/5">
-          <h1 className="text-5xl md:text-6xl font-black font-secondary text-stone-100">
+    <div className={`${styles.background} min-h-screen p-2 flex flex-row justify-center border-b border-slate-400 rounded-b-xl`}>
+      <div className="flex flex-col mt-3 lg:mt-24 container mx-auto">
+        <div className="m-1 overflow-hidden">
+          <h1 className="text-5xl md:text-6xl font-black font-secondary leading-snug text-slate-100">
             Nie wiesz
             gdzie jesteś?
           </h1>
-          <h2 className="text-2xl md:text-3xl mt-1 font-bold text-stone-300">
+          <h2 className="text-2xl md:text-3xl mt-3 font-bold text-slate-300">
             Wyślij nam zdjęcie!
           </h2>
           <PhotoCaptureInput
@@ -47,7 +48,7 @@ export default function Hero() {
             loading={isSearching}
           />
         </div>
-        <div className="flex-1">
+        <div className="mt-8">
           <SearchResultsDisplay results={searchResults} />
         </div>
       </div>

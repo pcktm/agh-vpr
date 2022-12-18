@@ -11,13 +11,14 @@ export default function PhotoCaptureInput({onSelect, loading}: {onSelect: (file:
     }
     onSelect(file as File);
   };
+
   return (
     <div>
       <div className="flex items-center justify-start w-full mt-5">
         <label
           htmlFor="dropzone-file"
           // eslint-disable-next-line max-len
-          className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-slate-700 border-slate-600 hover:bg-slate-800"
+          className="flex flex-col backdrop-blur items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer border-slate-600 hover:bg-slate-800"
         >
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             {
@@ -29,10 +30,7 @@ export default function PhotoCaptureInput({onSelect, loading}: {onSelect: (file:
             }
 
             <p className="mb-1 text-sm text-stone-400 font-semibold">
-              {loading ? 'Searching...' : 'Click to capture'}
-            </p>
-            <p className="text-xs text-slate-400">
-              {photo ? photo.name : 'No file chosen'}
+              {loading ? 'Szukanie...' : `Prześlij${photo ? ' kolejne ' : ' '}zdjęcie`}
             </p>
           </div>
           <input

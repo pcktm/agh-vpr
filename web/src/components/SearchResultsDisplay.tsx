@@ -1,5 +1,7 @@
 import autoAnimate from '@formkit/auto-animate';
 import {useRef, useEffect} from 'react';
+import {polishPlurals} from 'polish-plurals';
+import {MagnifyingGlassIcon} from '@heroicons/react/24/outline';
 import {SearchResults} from '../types';
 import SearchResult from './SearchResult';
 
@@ -12,22 +14,21 @@ export default function SearchResultsDisplay({results}: {results: SearchResults}
 
   useEffect(() => {
     if (parent.current && results.length > 0) {
-      // if mobile
-      if (window.innerWidth < 768) {
-        setTimeout(() => {
-          parent.current?.scrollIntoView({behavior: 'smooth'});
-        }, 200);
-      }
+      setTimeout(() => {
+        parent.current?.scrollIntoView({behavior: 'smooth'});
+      }, 200);
     }
   }, [parent, results]);
 
   return (
-    <div className="mt-2 xl:mt-0 p-4 overflow-x-scroll">
+    <div className="mt-2 xl:mt-0 p-1">
       <h3 className="text-xl text-slate-200 font-secondary">Wyniki wyszukiwania</h3>
       <p className="text-sm text-slate-300">
         {results.length}
         {' '}
-        wyników
+        {
+          polishPlurals('wynik', 'wyniki', 'wyników', results.length)
+        }
       </p>
       <div ref={parent}>
         {
@@ -36,6 +37,14 @@ export default function SearchResultsDisplay({results}: {results: SearchResults}
             <SearchResult result={result} />
           </div>
         ))
+      }
+        {
+        results.length === 0 && (
+          <div className="flex mt-10 flex-row justify-center items-center gap-2 p-4">
+            <MagnifyingGlassIcon className="w-6 h-6 text-slate-400" />
+            <p className="text-sm text-slate-300">Brak wyników</p>
+          </div>
+        )
       }
       </div>
     </div>
