@@ -7,8 +7,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Archivo", "sans-serif"],
-        
+        sans: ["Inter", "sans-serif"],
+        secondary: ["Secular One", "sans-serif"],
       }
     },
   },

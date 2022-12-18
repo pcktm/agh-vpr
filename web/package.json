@@ -9,8 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fontsource/archivo": "^4.5.10",
+    "@fontsource/inter": "^4.5.14",
+    "@fontsource/secular-one": "^4.5.9",
+    "@formkit/auto-animate": "^1.0.0-beta.5",
     "@heroicons/react": "^2.0.13",
+    "axios": "^1.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
