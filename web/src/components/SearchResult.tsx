@@ -15,7 +15,7 @@ export default function SearchResult({result}: {result: TSearchResult}) {
             {result.name}
           </h3>
           <p className="text-md text-slate-300">
-            {`${result.description}djfhksjdhfgkjsdhfskdjhfslkdjfhas;k qjdshf;aisj dq9 eujnd q[093uj 1jye 2wuieh 1jd 1[2j1;klwh`}
+            {result.description}
           </p>
         </div>
         <div className="flex gap-2  items-center">
