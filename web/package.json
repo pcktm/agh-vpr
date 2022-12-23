@@ -16,7 +16,9 @@
     "axios": "^1.2.1",
     "polish-plurals": "^1.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.6.0",
+    "zustand": "^4.1.5"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",

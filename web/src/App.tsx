@@ -1,17 +1,21 @@
 import {useState} from 'react';
-import reactLogo from './assets/react.svg';
-import Hero from './components/Hero';
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from 'react-router-dom';
+import IndexView from './views/Index';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <IndexView />,
+  },
+]);
 
 function App() {
   return (
     <div className="bg-slate-900 text-slate-100">
-      <Hero />
-      <div className="container mt-2 mx-auto p-4">
-        <h3 className="text-lg">Jak to działa?</h3>
-        <p className="text-sm text-slate-300">
-          Aplikacja wykorzystuje...
-        </p>
-      </div>
+      <RouterProvider router={router} />
     </div>
   );
 }

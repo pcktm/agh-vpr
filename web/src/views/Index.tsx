@@ -1,12 +1,12 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {BuildingLibraryIcon} from '@heroicons/react/24/outline';
-import PhotoCaptureInput from './PhotoCaptureInput';
+import PhotoCaptureInput from '../components/PhotoCaptureInput';
 import {SearchResults} from '../types';
-import SearchResultsDisplay from './SearchResultsDisplay';
+import SearchResultsDisplay from '../components/SearchResultsDisplay';
 import styles from '../styles/hero.module.scss';
 
-export default function Hero() {
+export default function IndexView() {
   const [isSearching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResults>([]);
   const [isFirstSearch, setFirstSearch] = useState(true);
@@ -40,6 +40,7 @@ export default function Hero() {
   };
 
   return (
+    <div>
     <div className={`${styles.background} min-h-screen p-2 flex flex-row justify-center border-b border-slate-400 rounded-b-xl`}>
       <div className="flex flex-col mt-4 lg:mt-24 container mx-auto">
         <div className="m-1 overflow-hidden">
@@ -64,5 +65,12 @@ export default function Hero() {
         </div>
       </div>
     </div>
+    <div className="container mt-2 mx-auto p-4">
+    <h3 className="text-lg">Jak to działa?</h3>
+    <p className="text-sm text-slate-300">
+      Aplikacja wykorzystuje...
+    </p>
+  </div>
+  </div>
   );
 }
