@@ -48,12 +48,12 @@ export default function IndexView() {
           <div className="flex flex-col mt-3 lg:mt-24 container mx-auto">
             <div className="m-1 overflow-hidden">
               <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 lg:gap-4">
-                <BuildingLibraryIcon className="w-14 h-14 text-slate-100" />
-                <h1 className="text-5xl md:text-6xl font-black font-secondary leading-snug text-slate-100">
+                <BuildingLibraryIcon className="md:w-14 md:h-14 h-9 w-9 text-slate-100" />
+                <h1 className="text-3xl md:text-5xl font-black font-secondary leading-snug text-slate-100">
                   Znajdź budynek
                 </h1>
               </div>
-              <h2 className="text-2xl md:text-3xl mt-3 font-bold text-slate-300">
+              <h2 className="text-lg md:text-2xl mt-0 md:mt-2 font-bold text-slate-300">
                 Nie wiesz gdzie jesteś? Zrób zdjęcie!
               </h2>
               <PhotoCaptureInput

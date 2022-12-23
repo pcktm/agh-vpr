@@ -18,7 +18,7 @@ export default function PhotoCaptureInput({onSelect, loading}: {onSelect: (file:
         <label
           htmlFor="dropzone-file"
           // eslint-disable-next-line max-len
-          className={`flex flex-col py-2 px-5 transition-all select-none backdrop-blur-xl border-2 ${loading ? 'border-indigo-800' : 'border-indigo-600 cursor-pointer hover:border-indigo-400'} bg-indigo-800 shadow-inner items-start justify-center w-full h-16 rounded-lg`}
+          className={`flex flex-col py-2 px-5 transition-all hover:shadow-xl shadow-lg duration-300 select-none backdrop-blur-sm border-2 ${loading ? 'border-indigo-800 animate-pulse backdrop-brightness-75' : 'border-indigo-600 cursor-pointer hover:border-indigo-400 backdrop-brightness-125 hover:backdrop-brightness-150'} items-start justify-center w-full h-16 rounded-lg`}
         >
           <div className="flex flex-row items-center gap-3">
             <CameraIcon className="w-8 h-8 text-indigo-200" />
