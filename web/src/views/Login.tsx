@@ -1,18 +1,24 @@
 /* eslint-disable max-len */
 import {ArrowLeftIcon, ArrowRightOnRectangleIcon} from '@heroicons/react/24/outline';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
 import axios from 'axios';
 import styles from '../styles/hero.module.scss';
+import {useAuthStore} from '../utils/stores';
 
 export default function LoginView() {
   const {register, handleSubmit, formState: {errors}} = useForm();
+  const authStore = useAuthStore();
+  const navigate = useNavigate();
 
   const onSubmit = (data: any) => {
     const params = new URLSearchParams(data);
     axios.post(`${import.meta.env.VITE_API_URL}/user/token`, params)
       .then((res) => {
-        console.log(res);
+        if (res.data.access_token) {
+          authStore.setToken(res.data.access_token);
+          navigate('/');
+        }
       })
       .catch((e) => {
         console.log(e);
@@ -58,7 +64,7 @@ export default function LoginView() {
                 className="p-2 rounded-md bg-indigo-800 text-white font-semibold flex flex-row justify-center items-center gap-2"
               >
                 <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                Zarejestruj się!
+                Zaloguj się
               </button>
             </form>
           </div>

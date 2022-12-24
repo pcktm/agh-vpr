@@ -10,7 +10,6 @@ import Navbar from '../components/Navbar';
 export default function IndexView() {
   const [isSearching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResults>([]);
-  const [isFirstSearch, setFirstSearch] = useState(true);
 
   const handleSearch = async (image: File) => {
     if (!image) {
@@ -22,7 +21,6 @@ export default function IndexView() {
       return;
     }
     setSearching(true);
-    setFirstSearch(false);
     setSearchResults([]);
     const formData = new FormData();
     formData.append('file', image);

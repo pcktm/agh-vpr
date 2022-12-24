@@ -1,17 +1,23 @@
 /* eslint-disable max-len */
 import {ArrowLeftIcon, ArrowRightOnRectangleIcon, UserPlusIcon} from '@heroicons/react/24/outline';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
 import axios from 'axios';
 import styles from '../styles/hero.module.scss';
+import {useAuthStore} from '../utils/stores';
 
 export default function SignupView() {
   const {register, handleSubmit, formState: {errors}} = useForm();
+  const authStore = useAuthStore();
+  const navigate = useNavigate();
 
   const onSubmit = (data: any) => {
     axios.post(`${import.meta.env.VITE_API_URL}/user/register`, data)
       .then((res) => {
-        console.log(res);
+        if (res.data.access_token) {
+          authStore.setToken(res.data.access_token);
+          navigate('/');
+        }
       })
       .catch((e) => {
         console.log(e);
