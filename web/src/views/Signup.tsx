@@ -1,8 +1,9 @@
 /* eslint-disable max-len */
-import {ArrowLeftIcon, ArrowRightOnRectangleIcon, UserPlusIcon} from '@heroicons/react/24/outline';
+import {ArrowLeftIcon, ArrowPathIcon, UserPlusIcon} from '@heroicons/react/24/outline';
 import {Link, useNavigate} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
 import axios from 'axios';
+import {useState} from 'react';
 import styles from '../styles/hero.module.scss';
 import {useAuthStore} from '../utils/stores';
 
@@ -10,8 +11,10 @@ export default function SignupView() {
   const {register, handleSubmit, formState: {errors}} = useForm();
   const authStore = useAuthStore();
   const navigate = useNavigate();
+  const [isBusy, setIsBusy] = useState(false);
 
   const onSubmit = (data: any) => {
+    setIsBusy(true);
     axios.post(`${import.meta.env.VITE_API_URL}/user/register`, data)
       .then((res) => {
         if (res.data.access_token) {
@@ -21,7 +24,7 @@ export default function SignupView() {
       })
       .catch((e) => {
         console.log(e);
-      });
+      }).finally(() => setIsBusy(false));
   };
 
   return (
@@ -65,13 +68,36 @@ export default function SignupView() {
                 {...register('last_name', {required: true})}
                 aria-invalid={errors.last_name ? 'true' : 'false'}
               />
+              {
+                errors.last_name && (
+                  <p className="text-red-500 text-sm font-semibold">
+                    Nazwisko jest wymagane
+                  </p>
+                )
+              }
               <input
                 type="text"
                 placeholder="Email"
                 className={`p-2 rounded-md bg-slate-800 border border-indigo-800 focus:outline-none focus:border-indigo-500 ${errors.email ? 'border-red-800 focus:border-red-500' : ''}`}
-                {...register('email', {pattern: /^\S+@\S+$/i, required: true})}
+                {...register('email', {
+                  pattern: {
+                    value: /\S+@\S+\.\S+/,
+                    message: 'Podaj poprawny adres email',
+                  },
+                  required: {
+                    value: true,
+                    message: 'Email jest wymagany',
+                  },
+                })}
                 aria-invalid={errors.email ? 'true' : 'false'}
               />
+              {
+                errors?.email?.message && (
+                  <p className="text-red-500 text-sm font-semibold">
+                    {String(errors.email.message)}
+                  </p>
+                )
+              }
               <input
                 type="password"
                 placeholder="Hasło"
@@ -79,12 +105,28 @@ export default function SignupView() {
                 {...register('password', {required: true})}
                 aria-invalid={errors.password ? 'true' : 'false'}
               />
+              {
+                errors.password && (
+                  <p className="text-red-500 text-sm font-semibold">
+                    Hasło jest wymagane
+                  </p>
+                )
+              }
               <button
                 type="submit"
-                className="p-2 rounded-md bg-indigo-800 text-white font-semibold flex flex-row justify-center items-center gap-2"
+                disabled={isBusy}
+                className={`p-2 rounded-md bg-indigo-800 text-white font-semibold flex flex-row justify-center items-center gap-2 ${isBusy ? 'animate-pulse' : ''}`}
               >
-                <UserPlusIcon className="w-5 h-5" />
-                Zarejestruj się!
+                {
+                  isBusy ? (
+                    <ArrowPathIcon className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <UserPlusIcon className="w-5 h-5" />
+                      Zarejestruj się!
+                    </>
+                  )
+                }
               </button>
             </form>
           </div>

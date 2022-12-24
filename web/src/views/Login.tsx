@@ -1,17 +1,22 @@
 /* eslint-disable max-len */
-import {ArrowLeftIcon, ArrowRightOnRectangleIcon} from '@heroicons/react/24/outline';
+import {ArrowLeftIcon, ArrowPathIcon, ArrowRightOnRectangleIcon} from '@heroicons/react/24/outline';
 import {Link, useNavigate} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
+import {useState} from 'react';
 import styles from '../styles/hero.module.scss';
 import {useAuthStore} from '../utils/stores';
 
 export default function LoginView() {
-  const {register, handleSubmit, formState: {errors}} = useForm();
+  const {
+    register, handleSubmit, formState: {errors}, resetField, setError,
+  } = useForm();
   const authStore = useAuthStore();
   const navigate = useNavigate();
+  const [isBusy, setIsBusy] = useState(false);
 
   const onSubmit = (data: any) => {
+    setIsBusy(true);
     const params = new URLSearchParams(data);
     axios.post(`${import.meta.env.VITE_API_URL}/user/token`, params)
       .then((res) => {
@@ -20,9 +25,17 @@ export default function LoginView() {
           navigate('/');
         }
       })
-      .catch((e) => {
-        console.log(e);
-      });
+      .catch((e: AxiosError) => {
+        if (e.response?.status === 401) {
+          resetField('password');
+          setError('password', {
+            type: 'manual',
+            message: 'Nieprawidłowy login lub hasło',
+          }, {
+            shouldFocus: true,
+          });
+        }
+      }).finally(() => setIsBusy(false));
   };
 
   return (
@@ -49,9 +62,25 @@ export default function LoginView() {
                 type="text"
                 placeholder="Email"
                 className={`p-2 rounded-md bg-slate-800 border border-indigo-800 focus:outline-none focus:border-indigo-500 ${errors.email ? 'border-red-800 focus:border-red-500' : ''}`}
-                {...register('username', {pattern: /^\S+@\S+$/i, required: true})}
-                aria-invalid={errors.username ? 'true' : 'false'}
+                {...register('username', {
+                  pattern: {
+                    value: /\S+@\S+\.\S+/,
+                    message: 'Podaj poprawny adres email',
+                  },
+                  required: {
+                    value: true,
+                    message: 'Email jest wymagany',
+                  },
+                })}
+                aria-invalid={errors.email ? 'true' : 'false'}
               />
+              {
+                errors?.email?.message && (
+                  <p className="text-red-500 text-sm font-semibold">
+                    {String(errors.email.message)}
+                  </p>
+                )
+              }
               <input
                 type="password"
                 placeholder="Hasło"
@@ -59,12 +88,26 @@ export default function LoginView() {
                 {...register('password', {required: true})}
                 aria-invalid={errors.password ? 'true' : 'false'}
               />
+              {errors?.password?.message && (
+                <p className="text-red-500 text-sm font-semibold">
+                  {`${errors.password.message}`}
+                </p>
+              )}
               <button
                 type="submit"
-                className="p-2 rounded-md bg-indigo-800 text-white font-semibold flex flex-row justify-center items-center gap-2"
+                disabled={isBusy}
+                className={`p-2 rounded-md bg-indigo-800 text-white font-semibold flex flex-row justify-center items-center gap-2 ${isBusy ? 'animate-pulse' : ''}`}
               >
-                <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                Zaloguj się
+                {
+                  isBusy ? (
+                    <ArrowPathIcon className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                      Zaloguj się!
+                    </>
+                  )
+                }
               </button>
             </form>
           </div>
