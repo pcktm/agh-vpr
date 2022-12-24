@@ -53,7 +53,7 @@ async def authenticate_user(email: str, password: str, db: Session):
 async def create_token(user: models.User):
     user_obj = schemas.User.from_orm(user)
 
-    token = jwt.encode(user_obj.dict(), JWT_SECRET)
+    token = jwt.encode({'id': user_obj.id}, JWT_SECRET)
 
     return dict(access_token=token, token_type="bearer")
 
