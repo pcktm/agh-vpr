@@ -16,23 +16,17 @@ import SignupView from './views/Signup';
 
 function App() {
   const token = useAuthStore((state) => state.token);
+  const fetchUser = useUserStore((state) => state.fetchUser);
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
-  const axios = useAxios();
   useEffect(() => {
     if (token) {
-      axios.get('/user/me')
-        .then((res) => {
-          setUser(res.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      fetchUser();
     } else {
       setUser(undefined);
       console.debug('Logged out');
     }
-  }, [token, axios, setUser]);
+  }, [token, setUser, fetchUser]);
 
   return (
     <div className="bg-slate-900 text-slate-100">
@@ -44,7 +38,7 @@ function App() {
           <Route
             path="/profile"
             element={<ProfileView />}
-            loader={() => {
+            loader={async () => {
               if (!user) {
                 return redirect('/login');
               }

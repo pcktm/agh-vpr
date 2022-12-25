@@ -1,5 +1,6 @@
 import create from 'zustand';
 import {persist} from 'zustand/middleware';
+import {axiosInstanceFactory} from './useAxios';
 
 interface AuthState {
   token?: string;
@@ -38,6 +39,7 @@ export type User = {
 interface UserState {
   user?: User;
   setUser: (user?: User) => void;
+  fetchUser: () => Promise<void>;
 }
 
 export const useUserStore = create<UserState>()(
@@ -45,6 +47,14 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       user: undefined,
       setUser: (user?: User) => set({user}),
+      fetchUser: async () => {
+        try {
+          const {data} = await axiosInstanceFactory(useAuthStore.getState().token).get('/user/me');
+          set({user: data});
+        } catch (e) {
+          console.error(e);
+        }
+      },
     }),
     {
       name: 'userStore',
