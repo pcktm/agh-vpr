@@ -1,9 +1,16 @@
 import {Place} from '../utils/stores';
-import {useAxiosSWR} from '../utils/useAxios';
+import {useAxios, useAxiosSWR, useMutate} from '../utils/useAxios';
 import SearchResult from './SearchResult';
 
 export default function RecentPlacesList() {
   const {data: places, error, isLoading} = useAxiosSWR<Place[]>('/history/');
+  const axios = useAxios();
+  const mutate = useMutate();
+
+  const clearHistory = async () => {
+    await axios.delete('/history/');
+    mutate('/history/');
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -15,7 +22,6 @@ export default function RecentPlacesList() {
           }
         {
             isLoading && (
-              // some skeleton loading indicator
               <div className="animate-pulse flex flex-row gap-2">
                 <div className="h-4 w-4 bg-slate-500 rounded-full" />
                 <div className="h-4 w-20 bg-slate-500 rounded-full" />
@@ -29,6 +35,17 @@ export default function RecentPlacesList() {
                   places.map((place) => (
                     <SearchResult key={place.id} result={place} />
                   ))
+                }
+                {
+                  places.length > 0 && (
+                    <button
+                      className="rounded mt-2 text-sm font-bold text-red-500 hover:text-red-600 self-end hover:underline"
+                      onClick={clearHistory}
+                      type="button"
+                    >
+                      Wyczyść historię
+                    </button>
+                  )
                 }
               </div>
             )
