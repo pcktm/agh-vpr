@@ -1,15 +1,16 @@
 import {useEffect, useState} from 'react';
-import axios from 'axios';
 import {BuildingLibraryIcon} from '@heroicons/react/24/outline';
 import PhotoCaptureInput from '../components/PhotoCaptureInput';
 import {SearchResults} from '../types';
 import SearchResultsDisplay from '../components/SearchResultsDisplay';
 import styles from '../styles/hero.module.scss';
 import Navbar from '../components/Navbar';
+import {useAxios} from '../utils/useAxios';
 
 export default function IndexView() {
   const [isSearching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResults>([]);
+  const axios = useAxios();
 
   const handleSearch = async (image: File) => {
     if (!image) {
@@ -25,7 +26,7 @@ export default function IndexView() {
     const formData = new FormData();
     formData.append('file', image);
     try {
-      const {data} = await axios.post<SearchResults>(`${import.meta.env.VITE_API_URL}/place/find`, formData, {
+      const {data} = await axios.post<SearchResults>('/place/find', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

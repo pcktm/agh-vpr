@@ -2,6 +2,7 @@ import axios from 'axios';
 import {
   useState, useEffect, useMemo, useCallback,
 } from 'react';
+import useSWR from 'swr';
 import {useAuthStore, useUserStore} from './stores';
 
 export const axiosInstanceFactory = (token?: string) => axios.create({
@@ -31,4 +32,13 @@ export const useAxios = () => {
   }, [token, setToken, setUser]);
 
   return ax;
+};
+
+export const useAxiosSWR = <T>(url: string, axiosOptions?: any, swrOptions?: any) => {
+  const token = useAuthStore((state) => state.token);
+  const ax = useAxios();
+  return useSWR<T>([url, token], async ([u, t]) => {
+    const {data: d} = await ax.get(u, axiosOptions);
+    return d;
+  });
 };

@@ -6,9 +6,7 @@ import {
   RouterProvider,
   redirect,
 } from 'react-router-dom';
-import create from 'zustand/react';
 import {useAuthStore, useUserStore} from './utils/stores';
-import {useAxios} from './utils/useAxios';
 import IndexView from './views/Index';
 import LoginView from './views/Login';
 import ProfileView from './views/Profile';
