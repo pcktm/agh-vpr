@@ -2,7 +2,7 @@ import axios from 'axios';
 import {
   useState, useEffect, useMemo, useCallback,
 } from 'react';
-import useSWR from 'swr';
+import useSWR, {useSWRConfig} from 'swr';
 import {useAuthStore, useUserStore} from './stores';
 
 export const axiosInstanceFactory = (token?: string) => axios.create({
@@ -41,4 +41,10 @@ export const useAxiosSWR = <T>(url: string, axiosOptions?: any, swrOptions?: any
     const {data: d} = await ax.get(u, axiosOptions);
     return d;
   });
+};
+
+export const useMutate = () => {
+  const {mutate: om} = useSWRConfig();
+  const token = useAuthStore((state) => state.token);
+  return useCallback((key: string | string[]) => om([key, token]), [token, om]);
 };

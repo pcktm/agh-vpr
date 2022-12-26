@@ -3,7 +3,7 @@ import {SearchResult as TSearchResult} from '../types';
 
 export default function SearchResult({result}: {result: TSearchResult}) {
   return (
-    <div className="border border-slate-600 backdrop-blur my-1.5 rounded-md flex gap-2 overflow-hidden">
+    <div className="border border-slate-600 backdrop-blur-sm backdrop-brightness-110 my-1.5 rounded-md flex gap-2 overflow-hidden">
       <img
         src={import.meta.env.VITE_API_URL + result.main_image}
         alt={result.name}

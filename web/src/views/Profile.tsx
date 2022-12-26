@@ -4,13 +4,14 @@ import {useNavigate, Link} from 'react-router-dom';
 import gravatarUrl from 'gravatar-url';
 import {useAuthStore, User, useUserStore} from '../utils/stores';
 import RecentPlacesList from '../components/RecentPlaces';
-import {useAxiosSWR} from '../utils/useAxios';
+import {useAxios, useAxiosSWR} from '../utils/useAxios';
 
 export default function ProfileView() {
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
   const avatarUrl = useMemo(() => gravatarUrl(user?.email ?? 'AGH', {size: 256, default: 'identicon'}), [user?.email]);
   const {data: currentUser, isLoading: isLastLoginLoading} = useAxiosSWR<User>('/user/me');
+  const axios = useAxios();
 
   if (!user) {
     navigate('/login');
@@ -24,7 +25,7 @@ export default function ProfileView() {
   };
 
   return (
-    <div className="min-h-screen container mx-auto pt-6 md:pt-10 px-4">
+    <div className="container mx-auto pt-6 md:pt-10 px-4 mb-10">
       <div className="flex flex-row items-cente mb-5 md:mb-10">
         <Link to="/">
           <div className="flex flex-row items-center gap-2">
@@ -56,7 +57,7 @@ export default function ProfileView() {
             src={avatarUrl}
             alt=""
           />
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-start">
             <h4 className="text-2xl font-bold font-secondary">{`${user.first_name} ${user.last_name}`}</h4>
             <p className="text-sm">
               {user.email}
@@ -85,7 +86,7 @@ export default function ProfileView() {
         </div>
       </div>
 
-      <div className="flex flex-col mb-12 w-full">
+      <div className="flex flex-col w-full">
         <h2 className="text-2xl font-bold font-secondary">Ostatnio odwiedzone miejsca</h2>
         <RecentPlacesList />
       </div>
