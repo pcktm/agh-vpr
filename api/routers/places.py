@@ -1,4 +1,4 @@
-from fastapi import BackgroundTasks, APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi import BackgroundTasks, APIRouter, UploadFile, File, Depends, HTTPException, security
 import cv2
 import numpy as np
 from sqlalchemy.orm import Session
@@ -15,23 +15,17 @@ router = APIRouter(
 
 
 @router.post("/find")
-async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db),
+                     user: schemas.User = Depends(crud.get_current_user_or_none)):
 
     image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
     if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
     places = best_match(image, db)
-
+    if user is not None:
+        place_id = places[0]['id']
+        await crud.add_to_history(db, user, place_id)
     return places
-
-
-@router.post("/find/{place_id}")
-async def add_place_to_history(place_id: int,
-                               user: schemas.User = Depends(crud.get_current_user),
-                               db: Session = Depends(get_db)):
-    await crud.add_to_history(db, user, place_id)
-
-    return {"message", "Successfully added to history"}
 
 
 @router.post("/create")

@@ -1,5 +1,3 @@
-# TODO: def delete_user()
-
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
 from database import get_db
@@ -13,6 +11,7 @@ import models
 import schemas
 
 oauth2schema = fastapi.security.OAuth2PasswordBearer(tokenUrl="/user/token")
+oauth2schema_optional = fastapi.security.OAuth2PasswordBearer(tokenUrl="/user/token", auto_error=False)
 
 JWT_SECRET = "myjwtsecret"
 
@@ -71,6 +70,18 @@ async def get_current_user(
         )
 
     return schemas.User.from_orm(user)
+
+
+async def get_current_user_or_none(
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2schema_optional),
+):
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        user = db.query(models.User).get(payload["id"])
+        return schemas.User.from_orm(user)
+    except:
+        return None
 
 
 # places functions
