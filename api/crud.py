@@ -85,6 +85,12 @@ async def get_current_user_or_none(
         return None
 
 
+async def get_user_created_places(db: Session, user_id: int):
+    places = db.query(models.Place).filter(models.Place.creator_id == user_id)
+
+    return list(map(schemas.Place.from_orm, places))
+
+
 # places functions
 def get_place(db: Session, place_id: int):
     return db.query(models.Place).filter(models.Place.id == place_id).first()
@@ -114,7 +120,8 @@ def exist_by_address(db: Session, place_address):
 
 async def create_place(db: Session, place: schemas.PlaceCreate):
     # print(place.name)
-    db_place = models.Place(name=place.name, address=place.address, description=place.description, main_image_id=0)
+    db_place = models.Place(name=place.name, address=place.address, description=place.description, main_image_id=0,
+                            creator_id=0)
 
     db.add(db_place)
     db.commit()
@@ -125,6 +132,15 @@ async def create_place(db: Session, place: schemas.PlaceCreate):
 async def update_main_image_id(db: Session, place_id: int, image_id: int):
     place = db.query(models.Place).filter(models.Place.id == place_id).first()
     place.main_image_id = image_id
+
+    db.commit()
+    db.refresh(place)
+    return place
+
+
+async def update_creator_id(db: Session, place_id: int, creator_id: int):
+    place = db.query(models.Place).filter(models.Place.id == place_id).first()
+    place.creator_id = creator_id
 
     db.commit()
     db.refresh(place)

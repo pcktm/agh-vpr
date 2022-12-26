@@ -49,6 +49,7 @@ async def create_place(background_tasks: BackgroundTasks,
         image_schema = schemas.ImageCreate(place_id=db_place.id, image=file_path)
         db_image = await crud.add_image(db, image_schema)
         await crud.update_main_image_id(db, db_place.id, db_image.id)
+        await crud.update_creator_id(db, db_place, user.id)
 
         background_tasks.add_task(add_image_to_file(file_path, image))
 

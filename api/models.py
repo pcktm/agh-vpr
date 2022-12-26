@@ -29,6 +29,7 @@ class Place(Base):
     address = Column(String, index=True)
     description = Column(String, index=True)
     main_image_id = Column(Integer, index=True)
+    creator_id = Column(Integer, index=True)
 
     images = relationship("Image", back_populates="place")
     histories = relationship("History", back_populates='place')
@@ -40,10 +41,6 @@ class Image(Base):
     id = Column(Integer, primary_key=True, index=True)
     place_id = Column(Integer, ForeignKey("places.id"))
     image = Column(String, index=True)
-    # image = Column(String, index=True)
-    # key_points = Column(String, index=True)
-    # score = Column(String, index=True)
-    # descriptor = Column(String, index=True)
 
     place = relationship("Place", back_populates="images")
 

@@ -46,7 +46,6 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    history: list[History] = []
 
     class Config:
         orm_mode = True
@@ -55,9 +54,6 @@ class User(UserBase):
 class ImageBase(BaseModel):
     image: str
     place_id: int
-    # key_points: str
-    # score: str
-    # descriptor: str
 
 
 class ImageCreate(ImageBase):
@@ -84,6 +80,7 @@ class PlaceCreate(PlaceBase):
 class Place(BaseModel):
     id: int
     main_image_id: int
+    creator_id: int
     images: list[Image] = []
     histories: list[History] = []
 

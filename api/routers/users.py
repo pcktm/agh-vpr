@@ -38,3 +38,9 @@ async def generate_token(
 @router.get("/me", response_model=schemas.User)
 async def get_user(user: schemas.User = Depends(crud.get_current_user)):
     return user
+
+
+@router.get("/places")
+async def get_user_created_places(db: Session = Depends(get_db),
+                                  user: schemas.User = Depends(crud.get_current_user)):
+    return await crud.get_user_created_places(db, user.id)
