@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from database import get_db
 
 import passlib.hash
@@ -62,12 +62,13 @@ async def get_current_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2schema),
 ):
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-        user = db.query(models.User).get(payload["id"])
-    except:
+    payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+    user = db.query(models.User).get(payload["id"])
+    if user is None:
         raise HTTPException(
-            status_code=401, detail="Invalid Email or Password"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials.",
+            headers={"WWW-Authenticate": "Bearer"}
         )
 
     return schemas.User.from_orm(user)
