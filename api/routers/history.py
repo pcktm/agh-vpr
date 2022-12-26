@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import crud
 import schemas
+import utils
 
 router = APIRouter(
     tags=['History'],
@@ -13,19 +14,10 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[schemas.History])
+@router.get("/")
 async def get_history(user: schemas.User = Depends(crud.get_current_user),
                       db: Session = Depends(get_db)):
-    return await crud.get_user_history(db, user.id)
-
-
-@router.get("/{history_id}")
-async def get_history_entity(
-        history_id: int,
-        user: schemas.User = Depends(crud.get_current_user),
-        db: Session = Depends(get_db)
-):
-    return await crud.get_history_entity(db, user, history_id)
+    return await utils.get_places_from_history(user, db)
 
 
 @router.delete("/", status_code=204)
@@ -36,12 +28,3 @@ async def delete_user_history(
     await crud.delete_user_history(db, user)
     return {"message", "Successfully Deleted"}
 
-
-@router.delete("/{history_id}", status_code=204)
-async def delete_from_history(
-        history_id: int,
-        user: schemas.User = Depends(crud.get_current_user),
-        db: Session = Depends(get_db)
-):
-    await crud.delete_from_history(db, user, history_id)
-    return {"message", "Successfully Deleted"}

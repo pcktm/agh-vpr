@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import desc, asc
 from fastapi import Depends, HTTPException
 from database import get_db
 
@@ -158,7 +159,7 @@ async def add_image(db: Session, image: schemas.ImageCreate):
 
 # history functions
 async def get_user_history(db: Session, user_id: int):
-    history = db.query(models.History).filter(models.History.user_id == user_id)
+    history = db.query(models.History).filter(models.History.user_id == user_id).order_by(desc(models.History.date))
 
     return list(map(schemas.History.from_orm, history))
 

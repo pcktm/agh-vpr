@@ -196,3 +196,19 @@ def add_image_to_file(filepath, image):
 
     with open("VPR/data/images_paths.pkl", "wb") as fp:
         pickle.dump(images_paths, fp, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+async def get_places_from_history(user, db):
+    history = await crud.get_user_history(db, user.id)
+    places = []
+
+    for history_e in list(history):
+        date = history_e.date
+        place_id = history_e.place_id
+        place = crud.get_place(db, place_id)
+        place = deepcopy(place)
+        place = place.__dict__
+        place['date'] = date
+        places.append(place)
+
+    return places
