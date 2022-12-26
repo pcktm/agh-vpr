@@ -23,8 +23,9 @@ async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db)
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
     places = best_match(image, db)
     if user is not None:
-        place_id = places[0]['id']
-        await crud.add_to_history(db, user, place_id)
+        if len([places]) > 0:
+            place_id = places[0]['id']
+            await crud.add_to_history(db, user, place_id)
     return places
 
 
