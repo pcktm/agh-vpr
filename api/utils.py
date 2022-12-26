@@ -206,9 +206,12 @@ async def get_places_from_history(user, db):
         date = history_e.date
         place_id = history_e.place_id
         place = crud.get_place(db, place_id)
+        main_img = crud.get_image_by_id(db, place.main_image_id).image
         place = deepcopy(place)
         place = place.__dict__
+        filepath = "/static/" + main_img
         place['date'] = date
+        place["main_image"] = filepath
         places.append(place)
 
     return places
