@@ -7,6 +7,7 @@ import passlib.hash
 import fastapi.security
 from datetime import datetime
 import jwt
+import os
 
 import models
 import schemas
@@ -128,15 +129,45 @@ def exist_by_address(db: Session, place_address):
     return True
 
 
-async def create_place(db: Session, place: schemas.PlaceCreate):
+async def create_place(db: Session, place: schemas.PlaceCreate, user: schemas.User):
     # print(place.name)
     db_place = models.Place(name=place.name, address=place.address, description=place.description, main_image_id=0,
-                            creator_id=0)
+                            creator_id=user.id)
 
     db.add(db_place)
     db.commit()
     db.refresh(db_place)
     return db_place
+
+
+async def place_selector(place_id: int, user: schemas.User, db: Session):
+    place = (
+        db.query(models.Place)
+        .filter_by(creator_id=user.id)
+        .filter(models.Place.id == place_id)
+        .first()
+    )
+
+    if place is None:
+        raise HTTPException(status_code=404, detail="This place does not exist.")
+
+    return place
+
+
+async def delete_place(db: Session, user: schemas.User, place_id: int):
+    db_place = await place_selector(place_id, user, db)
+    images = db_place.images
+    try:
+        delete_place_from_history(db, place_id)
+        for i in range(0, len(images)):
+            image = images[i]
+            os.remove(f"VPR/{image.image}")
+            db.delete(image)
+    except:
+        pass
+
+    db.delete(db_place)
+    db.commit()
 
 
 async def update_main_image_id(db: Session, place_id: int, image_id: int):
@@ -145,7 +176,6 @@ async def update_main_image_id(db: Session, place_id: int, image_id: int):
 
     db.commit()
     db.refresh(place)
-    return place
 
 
 async def update_creator_id(db: Session, place_id: int, creator_id: int):
@@ -158,6 +188,12 @@ async def update_creator_id(db: Session, place_id: int, creator_id: int):
 
 
 # images functions
+def get_image_by_name_b(db: Session, image: str):
+    image = db.query(models.Image).filter(models.Image.image == image).first()
+    if image is not None:
+        return True
+
+
 def get_image_by_name(db: Session, image: str):
     image = db.query(models.Image).filter(models.Image.image == image).first()
 
@@ -186,8 +222,8 @@ async def add_image(db: Session, image: schemas.ImageCreate):
 # history functions
 async def get_user_history(db: Session, user_id: int):
     history = db.query(models.History).filter(models.History.user_id == user_id).order_by(desc(models.History.date))
-
-    return list(map(schemas.History.from_orm, history))
+    if history is not None:
+        return list(map(schemas.History.from_orm, history))
 
 
 async def history_selector(history_id: int, user: schemas.User, db: Session):
@@ -215,6 +251,17 @@ async def delete_from_history(db: Session, user: schemas.User, history_id: int):
     db.commit()
 
 
+def delete_place_from_history(db: Session, place_id: int):
+    history = (
+        db.query(models.History)
+        .filter(models.History.place_id == place_id)
+        .first()
+    )
+
+    db.delete(history)
+    db.commit()
+
+
 async def delete_user_history(db: Session, user: schemas.User):
     user_history = db.query(models.History).filter_by(user_id=user.id)
 
@@ -233,3 +280,19 @@ async def add_to_history(db: Session, user: schemas.User, place_id: int):
 
     return db_history
 
+
+def exist_in_history(db: Session, user: schemas.User, place_id: int):
+    history = db.query(models.History).filter_by(user_id=user.id).filter(models.History.place_id == place_id).first()
+
+    if history is not None:
+        return True
+    else:
+        return False
+
+
+async def update_history_date(db: Session, user: schemas.User, place_id: int):
+    history = db.query(models.History).filter_by(user_id=user.id).filter(models.History.place_id == place_id).first()
+    history.date = datetime.now()
+
+    db.commit()
+    db.refresh(history)

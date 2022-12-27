@@ -33,7 +33,7 @@ class Place(Base):
     creator_id = Column(Integer, index=True)
 
     images = relationship("Image", back_populates="place")
-    histories = relationship("History", back_populates='place')
+    # histories = relationship("History", back_populates='place')
 
 
 class Image(Base):
@@ -54,5 +54,5 @@ class History(Base):
     place_id = Column(Integer, ForeignKey("places.id"))
     date = Column(DateTime, default=date.datetime.utcnow)
 
-    place = relationship("Place", back_populates='histories')
+    # place = relationship("Place", back_populates='histories')
     user = relationship("User", back_populates='user_history')

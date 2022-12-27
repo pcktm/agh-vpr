@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends, security
+from fastapi import APIRouter, HTTPException, Depends, security, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from database import get_db
+from utils import update_data
 import crud
 import schemas
 
@@ -44,3 +45,14 @@ async def get_user(user: schemas.User = Depends(crud.get_current_user)):
 async def get_user_created_places(db: Session = Depends(get_db),
                                   user: schemas.User = Depends(crud.get_current_user)):
     return await crud.get_user_created_places(db, user.id)
+
+
+@router.delete("/places/{place_id}", status_code=204)
+async def delete_created_place(background_tasks: BackgroundTasks,
+                               place_id: int,
+                               db: Session = Depends(get_db),
+                               user: schemas.User = Depends(crud.get_current_user)):
+    await crud.delete_place(db, user, place_id)
+    background_tasks.add_task(update_data)
+
+    return {"message", "Successfully Deleted"}

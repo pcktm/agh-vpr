@@ -83,7 +83,7 @@ class Place(BaseModel):
     main_image_id: int
     creator_id: int
     images: list[Image] = []
-    histories: list[History] = []
+    # histories: list[History] = []
 
     class Config:
         orm_mode = True

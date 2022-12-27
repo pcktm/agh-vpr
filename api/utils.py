@@ -206,12 +206,55 @@ async def get_places_from_history(user, db):
         date = history_e.date
         place_id = history_e.place_id
         place = crud.get_place(db, place_id)
-        main_img = crud.get_image_by_id(db, place.main_image_id).image
-        place = deepcopy(place)
-        place = place.__dict__
-        filepath = "/static/" + main_img
-        place['date'] = date
-        place["main_image"] = filepath
-        places.append(place)
+        if place is not None:
+            main_img = crud.get_image_by_id(db, place.main_image_id).image
+            place = deepcopy(place)
+            place = place.__dict__
+            filepath = "/static/" + main_img
+            place['date'] = date
+            place["main_image"] = filepath
+            places.append(place)
 
     return places
+
+
+def update_data():
+    files_from_database = glob("VPR/images/*")
+    files_from_user = glob("VPR/images_from_user/*")
+    files = files_from_database + files_from_user
+
+    images = {}
+    images_ = []
+    images_paths = []
+    for index, filename in enumerate(files):
+        image = cv2.imread(filename)
+        image1, inp1, scales1 = read_image(image, device, [640, 480], 0, 1)
+        data = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        images_.append(data)
+
+        if filename.startswith('VPR/'):
+            filename = filename[4:]
+
+        images_paths.append(filename)
+
+        pred1 = superpoint({'image': inp1})
+
+        batch = {**pred1, **{k: v for k, v in pred1.items()}, 'image': inp1}
+
+        images[f'{filename}'] = batch
+
+    with open('VPR/data/images.pth', 'wb') as fp:
+        torch.save(images, fp)
+
+    preprocessed_image = []
+    for image in images_:
+        descriptor = features(image)
+        if descriptor is not None:
+            histogram = build_histogram(descriptor, kmeans)
+            preprocessed_image.append(histogram)
+
+    with open("VPR/data/images_paths.pkl", "wb") as f:
+        pickle.dump(images_paths, f)
+
+    with open("VPR/data/preprocessed_image.pkl", "wb") as f:
+        pickle.dump(preprocessed_image, f)
