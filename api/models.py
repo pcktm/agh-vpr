@@ -14,6 +14,7 @@ class User(Base):
     last_name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    lastly_logged = Column(DateTime, index=True)
 
     user_history = relationship("History", back_populates="user")
 

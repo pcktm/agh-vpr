@@ -26,12 +26,20 @@ async def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 
 
+def update_lastly_logged(db: Session, user: schemas.User):
+    user = db.query(models.User).filter(models.User.id == user.id).first()
+    user.lastly_logged = datetime.now()
+
+    db.commit()
+    db.refresh(user)
+
+
 def create_user(db: Session, user: schemas.UserCreate):
     first_name = user.first_name
     last_name = user.last_name
     hashed_password = passlib.hash.bcrypt.hash(user.password)
     db_user = models.User(email=user.email, hashed_password=hashed_password, first_name=first_name,
-                          last_name=last_name)
+                          last_name=last_name, lastly_logged=datetime.now())
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -50,10 +58,11 @@ async def authenticate_user(email: str, password: str, db: Session):
     return user
 
 
-async def create_token(user: models.User):
+async def create_token(db: Session, user: models.User):
     user_obj = schemas.User.from_orm(user)
 
     token = jwt.encode({'id': user_obj.id}, JWT_SECRET)
+    update_lastly_logged(db, user)
 
     return dict(access_token=token, token_type="bearer")
 

@@ -46,6 +46,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+    lastly_logged: dt.datetime
 
     class Config:
         orm_mode = True

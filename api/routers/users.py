@@ -19,7 +19,7 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     user = crud.create_user(db=db, user=user)
 
-    return await crud.create_token(user)
+    return await crud.create_token(db, user)
 
 
 @router.post("/token")
@@ -32,7 +32,7 @@ async def generate_token(
     if not user:
         raise HTTPException(status_code=401, detail="Invalid Credentials")
 
-    return await crud.create_token(user)
+    return await crud.create_token(db, user)
 
 
 @router.get("/me", response_model=schemas.User)

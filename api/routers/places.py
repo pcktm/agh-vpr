@@ -1,4 +1,4 @@
-from fastapi import BackgroundTasks, APIRouter, UploadFile, File, Depends, HTTPException, security
+from fastapi import BackgroundTasks, APIRouter, UploadFile, File, Depends, HTTPException
 import cv2
 import numpy as np
 from sqlalchemy.orm import Session
