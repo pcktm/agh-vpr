@@ -230,7 +230,7 @@ def update_data(removed_images):
 
     img_indexes = []
     for rm_img in removed_images:
-        # images.pop(rm_img)
+        images.pop(rm_img)
         img_indexes.append(images_paths.index(rm_img))
 
     new_preprocessed_image = []
