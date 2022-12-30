@@ -3,10 +3,10 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from database import get_db
-import crud
-import schemas
-import utils
+from api.database import get_db
+import api.crud as crud
+import api.schemas as schemas
+import api.utils as utils
 
 router = APIRouter(
     tags=['History'],

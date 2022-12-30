@@ -3,11 +3,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from models import Base
-from database import engine, get_db
-from routers.places import router as places_routers
-from routers.users import router as users_routers
-from routers.history import router as history_routers
+from api.models import Base
+from api.database import engine, get_db
+from api.routers.places import router as places_routers
+from api.routers.users import router as users_routers
+from api.routers.history import router as history_routers
 import os
 
 Base.metadata.create_all(bind=engine)

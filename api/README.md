@@ -11,6 +11,4 @@ pip3 install -r requirements.txt
 ```
 
 ### run server
-```
- uvicorn main:app --reload
-```
+just run main file 

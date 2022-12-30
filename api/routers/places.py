@@ -2,11 +2,11 @@ from fastapi import BackgroundTasks, APIRouter, UploadFile, File, Depends, HTTPE
 import cv2
 import numpy as np
 from sqlalchemy.orm import Session
-from utils import best_match, add_image_to_file
+from api.utils import best_match, add_image_to_file
 
-from database import get_db
-import crud
-import schemas
+from api.database import get_db
+import api.crud as crud
+import api.schemas as schemas
 
 router = APIRouter(
     tags=['Place'],

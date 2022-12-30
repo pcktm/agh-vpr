@@ -5,14 +5,14 @@ import numpy as np
 import scipy.spatial.distance as metrics
 
 from sklearn.neighbors import NearestNeighbors
-from VPR.models.matching import Matching
-from VPR.models.utils import read_image
-from VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans, calculate_descriptors
+from api.VPR.models.matching import Matching
+from api.VPR.models.utils import read_image
+from api.VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans, calculate_descriptors
 # from sklearn.neighbors import NearestNeighbors
 from glob import glob
 from copy import deepcopy
 
-import crud
+import api.crud as crud
 import time
 
 torch.set_grad_enabled(False)

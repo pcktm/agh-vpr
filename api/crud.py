@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
 from fastapi import Depends, HTTPException, status
-from database import get_db
+from api.database import get_db
 
 import passlib.hash
 import fastapi.security
@@ -9,8 +9,8 @@ from datetime import datetime
 import jwt
 import os
 
-import models
-import schemas
+import api.models as models
+import api.schemas as schemas
 
 oauth2schema = fastapi.security.OAuth2PasswordBearer(tokenUrl="/user/token")
 oauth2schema_optional = fastapi.security.OAuth2PasswordBearer(tokenUrl="/user/token", auto_error=False)
@@ -158,13 +158,14 @@ async def delete_place(db: Session, user: schemas.User, place_id: int):
     db_place = await place_selector(place_id, user, db)
     images = db_place.images
     try:
-        delete_place_from_history(db, place_id)
         for i in range(0, len(images)):
             image = images[i]
             os.remove(f"VPR/{image.image}")
             db.delete(image)
     except:
         pass
+
+    delete_place_from_history(db, place_id)
 
     db.delete(db_place)
     db.commit()
