@@ -218,43 +218,33 @@ async def get_places_from_history(user, db):
     return places
 
 
-def update_data():
-    files_from_database = glob("VPR/images/*")
-    files_from_user = glob("VPR/images_from_user/*")
-    files = files_from_database + files_from_user
+def update_data(removed_images):
+    with open('VPR/data/images.pth', 'rb') as fp:
+        images = torch.load(fp)
 
-    images = {}
-    images_ = []
-    images_paths = []
-    for index, filename in enumerate(files):
-        image = cv2.imread(filename)
-        image1, inp1, scales1 = read_image(image, device, [640, 480], 0, 1)
-        data = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        images_.append(data)
+    with open("VPR/data/preprocessed_image.pkl", "rb") as fb:
+        preprocessed_image = pickle.load(fb)
 
-        if filename.startswith('VPR/'):
-            filename = filename[4:]
+    with open('VPR/data/images_paths.pkl', 'rb') as f:
+        images_paths = pickle.load(f)
 
-        images_paths.append(filename)
+    img_indexes = []
+    for rm_img in removed_images:
+        # images.pop(rm_img)
+        img_indexes.append(images_paths.index(rm_img))
 
-        pred1 = superpoint({'image': inp1})
-
-        batch = {**pred1, **{k: v for k, v in pred1.items()}, 'image': inp1}
-
-        images[f'{filename}'] = batch
+    new_preprocessed_image = []
+    new_images_paths = []
+    for idx in range(0, len(preprocessed_image)):
+        if idx not in img_indexes:
+            new_preprocessed_image.append(preprocessed_image[idx])
+            new_images_paths.append(images_paths[idx])
 
     with open('VPR/data/images.pth', 'wb') as fp:
         torch.save(images, fp)
 
-    preprocessed_image = []
-    for image in images_:
-        descriptor = features(image)
-        if descriptor is not None:
-            histogram = build_histogram(descriptor, kmeans)
-            preprocessed_image.append(histogram)
-
     with open("VPR/data/images_paths.pkl", "wb") as f:
-        pickle.dump(images_paths, f)
+        pickle.dump(new_images_paths, f)
 
     with open("VPR/data/preprocessed_image.pkl", "wb") as f:
-        pickle.dump(preprocessed_image, f)
+        pickle.dump(new_preprocessed_image, f)

@@ -52,7 +52,7 @@ async def delete_created_place(background_tasks: BackgroundTasks,
                                place_id: int,
                                db: Session = Depends(get_db),
                                user: schemas.User = Depends(crud.get_current_user)):
-    await crud.delete_place(db, user, place_id)
-    background_tasks.add_task(update_data)
+    removed_images = await crud.delete_place(db, user, place_id)
+    background_tasks.add_task(update_data, removed_images)
 
     return {"message", "Successfully Deleted"}

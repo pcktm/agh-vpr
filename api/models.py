@@ -16,7 +16,7 @@ class User(Base):
     hashed_password = Column(String)
     lastly_logged = Column(DateTime, index=True)
 
-    user_history = relationship("History", back_populates="user")
+    user_history = relationship("History")
 
     def verify_password(self, password: str):
         return _hash.bcrypt.verify(password, self.hashed_password)
@@ -54,5 +54,3 @@ class History(Base):
     place_id = Column(Integer, ForeignKey("places.id"))
     date = Column(DateTime, default=date.datetime.utcnow)
 
-    # place = relationship("Place", back_populates='histories')
-    user = relationship("User", back_populates='user_history')

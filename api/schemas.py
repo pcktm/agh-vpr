@@ -47,6 +47,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     lastly_logged: dt.datetime
+    # user_history: list[History] = []
 
     class Config:
         orm_mode = True
@@ -83,7 +84,6 @@ class Place(BaseModel):
     main_image_id: int
     creator_id: int
     images: list[Image] = []
-    # histories: list[History] = []
 
     class Config:
         orm_mode = True

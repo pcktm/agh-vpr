@@ -157,10 +157,12 @@ async def place_selector(place_id: int, user: schemas.User, db: Session):
 async def delete_place(db: Session, user: schemas.User, place_id: int):
     db_place = await place_selector(place_id, user, db)
     images = db_place.images
+    removed_images = []
     try:
         for i in range(0, len(images)):
             image = images[i]
             os.remove(f"VPR/{image.image}")
+            removed_images.append(image.image)
             db.delete(image)
     except:
         pass
@@ -169,6 +171,8 @@ async def delete_place(db: Session, user: schemas.User, place_id: int):
 
     db.delete(db_place)
     db.commit()
+
+    return removed_images
 
 
 async def update_main_image_id(db: Session, place_id: int, image_id: int):
@@ -258,9 +262,9 @@ def delete_place_from_history(db: Session, place_id: int):
         .filter(models.History.place_id == place_id)
         .first()
     )
-
-    db.delete(history)
-    db.commit()
+    if history is not None:
+        db.delete(history)
+        db.commit()
 
 
 async def delete_user_history(db: Session, user: schemas.User):
