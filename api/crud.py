@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
 from fastapi import Depends, HTTPException, status
-from api.database import get_db
+from database import get_db
 
 import passlib.hash
 import fastapi.security
@@ -9,8 +9,8 @@ from datetime import datetime
 import jwt
 import os
 
-import api.models as models
-import api.schemas as schemas
+import models as models
+import schemas as schemas
 
 oauth2schema = fastapi.security.OAuth2PasswordBearer(tokenUrl="/user/token")
 oauth2schema_optional = fastapi.security.OAuth2PasswordBearer(tokenUrl="/user/token", auto_error=False)

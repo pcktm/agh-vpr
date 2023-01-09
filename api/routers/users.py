@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, security, BackgroundTasks
 from sqlalchemy.orm import Session
 
-from api.database import get_db
-from api.utils import update_data
-import api.crud as crud
-import api.schemas as schemas
+from database import get_db
+from utils import update_data
+import crud as crud
+import schemas as schemas
 
 router = APIRouter(
     tags=['User'],
