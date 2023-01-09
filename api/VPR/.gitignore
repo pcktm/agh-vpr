@@ -1,4 +1,6 @@
 images
+data
+data_agh
 images_from_user
 data/descriptors.pkl
 data/images.pth

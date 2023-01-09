@@ -4,11 +4,11 @@ import cv2
 import numpy as np
 import scipy.spatial.distance as metrics
 
-from sklearn.neighbors import NearestNeighbors
+# from sklearn.neighbors import NearestNeighbors
 from api.VPR.models.matching import Matching
 from api.VPR.models.utils import read_image
 from api.VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans, calculate_descriptors
-# from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import NearestNeighbors
 from glob import glob
 from copy import deepcopy
 
@@ -37,7 +37,7 @@ matching = Matching(config).eval().to(device)
 superpoint = matching.superpoint.to(device)
 
 
-with open('VPR/data/kmeans_bovw_model.pkl', 'rb') as fp:
+with open('VPR/data_agh/kmeans_bovw_model.pkl', 'rb') as fp:
     kmeans = pickle.load(fp)
 
 
@@ -70,12 +70,12 @@ with open('VPR/data/kmeans_bovw_model.pkl', 'rb') as fp:
 
 
 def bag_of_vwords_search(image_):
-    with open("VPR/data/preprocessed_image.pkl", "rb") as fb:
+    with open("VPR/data_agh/preprocessed_image.pkl", "rb") as fb:
         preprocessed_image = pickle.load(fb)
 
     descriptor = features(image_)
     histogram = build_histogram(descriptor, kmeans)
-    neighbor = NearestNeighbors(n_neighbors=20)
+    neighbor = NearestNeighbors(n_neighbors=40)
     neighbor.fit(preprocessed_image)
     dist, result = neighbor.kneighbors([histogram])
 
@@ -84,10 +84,10 @@ def bag_of_vwords_search(image_):
 
 def match(img_raw):
 
-    with open('VPR/data/images.pth', 'rb') as fp:
+    with open('VPR/data_agh/images.pth', 'rb') as fp:
         images = torch.load(fp)
 
-    with open('VPR/data/images_paths.pkl', 'rb') as f:
+    with open('VPR/data_agh/images_paths.pkl', 'rb') as f:
         images_paths = pickle.load(f)
 
     image0, inp0, scales0 = read_image(img_raw, device, [640, 480], 0, 1)
@@ -126,6 +126,7 @@ def match(img_raw):
         best.append((len(mkpts0), image))
 
     best.sort(key=lambda tup: tup[0], reverse=True)
+    print(best)
 
     return best
 
@@ -159,13 +160,13 @@ def best_match(image_, db):
 
 def add_image_to_file(filepath, image):
 
-    with open('VPR/data/images.pth', 'rb') as fp:
+    with open('VPR/data_agh/images.pth', 'rb') as fp:
         images = torch.load(fp)
 
-    with open("VPR/data/preprocessed_image.pkl", "rb") as fb:
+    with open("VPR/data_agh/preprocessed_image.pkl", "rb") as fb:
         preprocessed_image = pickle.load(fb)
 
-    with open('VPR/data/images_paths.pkl', 'rb') as f:
+    with open('VPR/data_agh/images_paths.pkl', 'rb') as f:
         images_paths = pickle.load(f)
 
 
@@ -188,13 +189,13 @@ def add_image_to_file(filepath, image):
 
     # calculate_descriptors("VPR/images/*", "VPR/images_from_user/*", "VPR/data/descriptors.pkl")
 
-    with open('VPR/data/images.pth', 'wb') as fp:
+    with open('VPR/data_agh/images.pth', 'wb') as fp:
         torch.save(images, fp)
 
-    with open("VPR/data/preprocessed_image.pkl", "wb") as fp:
+    with open("VPR/data_agh/preprocessed_image.pkl", "wb") as fp:
         pickle.dump(preprocessed_image, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
-    with open("VPR/data/images_paths.pkl", "wb") as fp:
+    with open("VPR/data_agh/images_paths.pkl", "wb") as fp:
         pickle.dump(images_paths, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -219,13 +220,13 @@ async def get_places_from_history(user, db):
 
 
 def update_data(removed_images):
-    with open('VPR/data/images.pth', 'rb') as fp:
+    with open('VPR/data_agh/images.pth', 'rb') as fp:
         images = torch.load(fp)
 
-    with open("VPR/data/preprocessed_image.pkl", "rb") as fb:
+    with open("VPR/data_agh/preprocessed_image.pkl", "rb") as fb:
         preprocessed_image = pickle.load(fb)
 
-    with open('VPR/data/images_paths.pkl', 'rb') as f:
+    with open('VPR/data_agh/images_paths.pkl', 'rb') as f:
         images_paths = pickle.load(f)
 
     img_indexes = []
@@ -240,11 +241,11 @@ def update_data(removed_images):
             new_preprocessed_image.append(preprocessed_image[idx])
             new_images_paths.append(images_paths[idx])
 
-    with open('VPR/data/images.pth', 'wb') as fp:
+    with open('VPR/data_agh/images.pth', 'wb') as fp:
         torch.save(images, fp)
 
-    with open("VPR/data/images_paths.pkl", "wb") as f:
+    with open("VPR/data_agh/images_paths.pkl", "wb") as f:
         pickle.dump(new_images_paths, f)
 
-    with open("VPR/data/preprocessed_image.pkl", "wb") as f:
+    with open("VPR/data_agh/preprocessed_image.pkl", "wb") as f:
         pickle.dump(new_preprocessed_image, f)

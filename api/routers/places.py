@@ -42,7 +42,7 @@ async def create_place(background_tasks: BackgroundTasks,
     if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
 
-    if not crud.exist_by_name(db, place.name) and not crud.exist_by_address(db, place.address):
+    if not crud.exist_by_name(db, place.name):
 
         db_place = await crud.create_place(db, place, user)
         n = crud.get_number_of_images(db) + 1

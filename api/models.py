@@ -27,6 +27,7 @@ class Place(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
+    code = Column(String, index=True)
     address = Column(String, index=True)
     description = Column(String, index=True)
     main_image_id = Column(Integer, index=True)

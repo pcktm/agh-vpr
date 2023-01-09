@@ -71,6 +71,7 @@ class Image(ImageBase):
 
 class PlaceBase(BaseModel):
     name: str
+    code: str
     address: str
     description: str
 

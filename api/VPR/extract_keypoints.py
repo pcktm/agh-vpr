@@ -45,19 +45,27 @@ def extract_keypoints(list_files):
 
 
 if __name__ == '__main__':
-    files_from_database = glob("images/*")
+    files_from_database = glob("images_agh/*")
     files_from_user = glob("images_from_user/*")
     files = files_from_database + files_from_user
     images = extract_keypoints(files)
 
     # calculate_descriptors("images/*", "images_from_user/*", "data/descriptors.pkl")
-
-    with open('data/images.pth', 'wb') as fp:
+    #
+    with open('data_agh/images.pth', 'wb') as fp:
         torch.save(images, fp)
 
     kmeans, images = calculate_kmeans()
+    # with open('VPR/data_agh/kmeans_bovw_model.pkl', 'rb') as fp:
+    #     kmeans = pickle.load(fp)
+    # images = []
+    # for image_path in files:
+    #     data = cv2.imread(image_path)
+    #     data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+    #     images.append(data)
+
     preproces_images(images, kmeans)
-    
-    with open("data/kmeans_bovw_model.pkl", "wb") as f:
+
+    with open("data_agh/kmeans_bovw_model.pkl", "wb") as f:
         pickle.dump(kmeans, f)
 

@@ -15,7 +15,14 @@ def calculate_kmeans():
 
     images_paths1 = glob("images/*")
     images_paths2 = glob("images_from_user/*")
-    images_paths = images_paths1 + images_paths2
+    images_paths3 = glob("images_agh/*")
+    images_paths = images_paths2 + images_paths3
+
+    for image_path in images_paths1:
+        data = cv2.imread(image_path)
+        data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+        descriptor = features(data)
+        descriptor_list.append(descriptor)
 
     for image_path in images_paths:
         data = cv2.imread(image_path)
@@ -26,10 +33,10 @@ def calculate_kmeans():
 
     descriptor_list = vstack_descriptors(descriptor_list)
 
-    kmeans = KMeans(n_clusters=800)
+    kmeans = KMeans(n_clusters=175)
     kmeans.fit(descriptor_list)
 
-    with open("data/images_paths.pkl", "wb") as f:
+    with open("data_agh/images_paths.pkl", "wb") as f:
         pickle.dump(images_paths, f)
 
     return kmeans, images
@@ -44,6 +51,6 @@ def preproces_images(images, kmeans):
             histogram = build_histogram(descriptor, kmeans)
             preprocessed_image.append(histogram)
 
-    with open("data/preprocessed_image.pkl", "wb") as f:
+    with open("data_agh/preprocessed_image.pkl", "wb") as f:
         pickle.dump(preprocessed_image, f)
 
