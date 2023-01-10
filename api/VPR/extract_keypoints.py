@@ -55,14 +55,14 @@ if __name__ == '__main__':
     with open('data_agh/images.pth', 'wb') as fp:
         torch.save(images, fp)
 
-    kmeans, images = calculate_kmeans()
-    # with open('VPR/data_agh/kmeans_bovw_model.pkl', 'rb') as fp:
-    #     kmeans = pickle.load(fp)
-    # images = []
-    # for image_path in files:
-    #     data = cv2.imread(image_path)
-    #     data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
-    #     images.append(data)
+    # kmeans, images = calculate_kmeans()
+    with open('data_agh/kmeans_bovw_model.pkl', 'rb') as fp:
+        kmeans = pickle.load(fp)
+    images = []
+    for image_path in files:
+        data = cv2.imread(image_path)
+        data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+        images.append(data)
 
     preproces_images(images, kmeans)
 

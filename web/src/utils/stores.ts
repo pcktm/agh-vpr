@@ -33,7 +33,7 @@ export type User = {
   email: string;
   first_name: string;
   last_name: string;
-  last_login: string;
+  lastly_logged: string;
   history: Place[];
 };
 
