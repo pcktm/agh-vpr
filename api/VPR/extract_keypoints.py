@@ -56,7 +56,7 @@ if __name__ == '__main__':
         torch.save(images, fp)
 
     kmeans, images = calculate_kmeans()
-    # with open('VPR/data_agh/kmeans_bovw_model.pkl', 'rb') as fp:
+    # with open('data_agh/kmeans_bovw_model.pkl', 'rb') as fp:
     #     kmeans = pickle.load(fp)
     # images = []
     # for image_path in files:

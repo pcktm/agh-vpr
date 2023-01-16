@@ -34,7 +34,7 @@ async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db)
 
 @router.post("/create")
 async def create_place(background_tasks: BackgroundTasks,
-                       place: schemas.PlaceCreate = Depends(),
+                       place: schemas.PlaceCreate,
                        file: UploadFile = File(...), db: Session = Depends(get_db),
                        user: schemas.User = Depends(crud.get_current_user)):
 
