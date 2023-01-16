@@ -4,7 +4,7 @@ import {useRef, useEffect, useState} from 'react';
 import {polishPlurals} from 'polish-plurals';
 import {QuestionMarkCircleIcon, ArrowPathIcon} from '@heroicons/react/24/outline';
 import {SearchResults} from '../types';
-import SearchResult from './SearchResult';
+import {SmallPlaceBox, LargePlaceBox} from './PlaceBox';
 
 export default function SearchResultsDisplay({results, loading}: {results: SearchResults, loading?: boolean}) {
   const parent = useRef<HTMLDivElement>(null);
@@ -32,14 +32,31 @@ export default function SearchResultsDisplay({results, loading}: {results: Searc
       <p className={`text-sm text-slate-300 transition-all duration-500 ${results?.length ? 'opacity-100' : 'opacity-0'}`}>
         {results?.length ? `${results.length} ${polishPlurals('wynik', 'wyniki', 'wyników', results.length)}` : ' '}
       </p>
-      <div ref={parent}>
+      <div ref={parent} className="pt-3">
         {
-        results.map((result) => (
-          <div key={result.id}>
-            <SearchResult result={result} />
-          </div>
-        ))
-      }
+          results.length > 0 && (
+            <>
+              <LargePlaceBox result={results[0]} />
+              {results.length > 1 && (
+                <div className="flex mt-3 flex-col justify-center items-center gap-1 p-4 text-slate-400">
+                  <p className="text-center text-sm">
+                    pozostałe wyniki
+                  </p>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75" />
+                  </svg>
+                </div>
+              )}
+              {
+                results.slice(1).map((result) => (
+                  <div key={result.id}>
+                    <SmallPlaceBox result={result} />
+                  </div>
+                ))
+              }
+            </>
+          )
+        }
         {
         (results.length === 0 && !loading && wasEverChanged) && (
           <div className="flex mt-12 flex-col justify-center items-center gap-1 p-4">

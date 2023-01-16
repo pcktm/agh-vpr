@@ -31,7 +31,7 @@ export default function IndexView() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setSearchResults(data ?? []);
+      setSearchResults(data.slice(0, 6) ?? []);
     } catch (e) {
       console.error(e);
     } finally {

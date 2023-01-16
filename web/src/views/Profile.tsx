@@ -57,8 +57,8 @@ export default function ProfileView() {
             src={avatarUrl}
             alt=""
           />
-          <div className="flex flex-col items-start">
-            <h4 className="text-2xl font-bold font-secondary">{`${user.first_name} ${user.last_name}`}</h4>
+          <div className="flex flex-col items-center sm:items-start">
+            <h4 className="text-2xl font-bold font-secondary text-center">{`${user.first_name} ${user.last_name}`}</h4>
             <p className="text-sm">
               {user.email}
             </p>
@@ -69,12 +69,12 @@ export default function ProfileView() {
       <div className="flex flex-col items-center mb-12 w-full">
         <div className="flex flex-col w-full sm:flex-row items-center gap-4 md:gap-10 p-6 md:p-8 rounded border border-indigo-600 backdrop-brightness-125">
           <ClockIcon className="h-10 w-10 text-indigo-200" />
-          <div className="flex flex-col">
-            <h4 className="text-2xl font-bold font-secondary">Ostatnie logowanie</h4>
+          <div className="flex flex-col items-center sm:items-start">
+            <h4 className="text-2xl font-bold font-secondary text-center">Ostatnie logowanie</h4>
             <div className="text-sm mt-1">
               {
-                currentUser?.last_login ? (
-                  <p>{new Date(currentUser?.last_login).toLocaleString()}</p>
+                currentUser?.lastly_logged ? (
+                  <p>{new Date(currentUser?.lastly_logged).toLocaleString()}</p>
                 ) : (
                   <div className="animate-pulse">
                     <div className="h-4 bg-gray-300 rounded w-3/4 opacity-50" />

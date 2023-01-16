@@ -1,6 +1,6 @@
 import {Place} from '../utils/stores';
 import {useAxios, useAxiosSWR, useMutate} from '../utils/useAxios';
-import SearchResult from './SearchResult';
+import {SmallPlaceBox} from './PlaceBox';
 
 export default function RecentPlacesList() {
   const {data: places, error, isLoading} = useAxiosSWR<Place[]>('/history/');
@@ -33,7 +33,7 @@ export default function RecentPlacesList() {
               <div className="flex flex-col gap-0">
                 {
                   places.map((place) => (
-                    <SearchResult key={place.id} result={place} />
+                    <SmallPlaceBox key={place.id} result={place} />
                   ))
                 }
                 {
