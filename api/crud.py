@@ -69,8 +69,8 @@ async def create_token(db: Session, user: models.User):
 
 
 async def get_current_user(
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2schema),
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2schema),
 ):
     payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
     user = db.query(models.User).get(payload["id"])
@@ -85,8 +85,8 @@ async def get_current_user(
 
 
 async def get_current_user_or_none(
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2schema_optional),
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2schema_optional),
 ):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
@@ -129,10 +129,9 @@ def exist_by_address(db: Session, place_address):
     return True
 
 
-async def create_place(db: Session, place: schemas.PlaceCreate, user: schemas.User):
-    # print(place.name)
-    db_place = models.Place(name=place.name, address=place.address, code=place.code, description=place.description,
-                            main_image_id=0, creator_id=user.id)
+async def create_place(db: Session, place, user: schemas.User):
+    db_place = models.Place(name=place["name"], address=place["address"], code=place["code"],
+                            description=place["description"], main_image_id=0, creator_id=user.id)
 
     db.add(db_place)
     db.commit()

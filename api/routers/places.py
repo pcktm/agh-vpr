@@ -34,7 +34,10 @@ async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db)
 
 @router.post("/create")
 async def create_place(background_tasks: BackgroundTasks,
-                       place: schemas.PlaceCreate = Form(...),
+                       name: str = Form(),
+                       code: str = Form(),
+                       address: str = Form(),
+                       description: str = Form(),
                        file: UploadFile = File(...),
                        db: Session = Depends(get_db),
                        user: schemas.User = Depends(crud.get_current_user)):
@@ -43,7 +46,9 @@ async def create_place(background_tasks: BackgroundTasks,
     if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
 
-    if not crud.exist_by_name(db, place.name):
+    if not crud.exist_by_name(db, name):
+
+        place = {"name": name, "code": code, "address": address, "description": description}
 
         db_place = await crud.create_place(db, place, user)
         n = crud.get_number_of_images(db) + 1
