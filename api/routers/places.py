@@ -1,4 +1,4 @@
-from fastapi import BackgroundTasks, APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi import BackgroundTasks, APIRouter, UploadFile, File, Depends, HTTPException, Form
 import cv2
 import numpy as np
 from sqlalchemy.orm import Session
@@ -34,8 +34,9 @@ async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db)
 
 @router.post("/create")
 async def create_place(background_tasks: BackgroundTasks,
-                       place: schemas.PlaceCreate,
-                       file: UploadFile = File(...), db: Session = Depends(get_db),
+                       place: schemas.PlaceCreate = Form(...),
+                       file: UploadFile = File(...),
+                       db: Session = Depends(get_db),
                        user: schemas.User = Depends(crud.get_current_user)):
 
     image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)

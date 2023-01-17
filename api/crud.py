@@ -131,8 +131,8 @@ def exist_by_address(db: Session, place_address):
 
 async def create_place(db: Session, place: schemas.PlaceCreate, user: schemas.User):
     # print(place.name)
-    db_place = models.Place(name=place.name, address=place.address, description=place.description, main_image_id=0,
-                            creator_id=user.id)
+    db_place = models.Place(name=place.name, address=place.address, code=place.code, description=place.description,
+                            main_image_id=0, creator_id=user.id)
 
     db.add(db_place)
     db.commit()
