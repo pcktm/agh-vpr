@@ -219,6 +219,24 @@ async def get_places_from_history(user, db):
     return places
 
 
+async def get_user_created_places(user, db):
+    db_places = await crud.get_user_created_places(db, user.id)
+    places = []
+
+    for place in list(db_places):
+        place_id = place.id
+        place = crud.get_place(db, place_id)
+        if place is not None:
+            main_img = crud.get_image_by_id(db, place.main_image_id).image
+            place = deepcopy(place)
+            place = place.__dict__
+            filepath = "/static/" + main_img
+            place["main_image"] = filepath
+            places.append(place)
+
+    return places
+
+
 def update_data(removed_images):
     with open('VPR/data_agh/images.pth', 'rb') as fp:
         images = torch.load(fp)

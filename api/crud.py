@@ -99,7 +99,8 @@ async def get_current_user_or_none(
 async def get_user_created_places(db: Session, user_id: int):
     places = db.query(models.Place).filter(models.Place.creator_id == user_id)
 
-    return list(map(schemas.Place.from_orm, places))
+    if places is not None:
+        return list(map(schemas.Place.from_orm, places))
 
 
 # places functions

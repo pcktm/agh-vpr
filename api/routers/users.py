@@ -5,6 +5,7 @@ from database import get_db
 from utils import update_data
 import crud as crud
 import schemas as schemas
+import utils as utils
 
 router = APIRouter(
     tags=['User'],
@@ -44,7 +45,7 @@ async def get_user(user: schemas.User = Depends(crud.get_current_user)):
 @router.get("/places")
 async def get_user_created_places(db: Session = Depends(get_db),
                                   user: schemas.User = Depends(crud.get_current_user)):
-    return await crud.get_user_created_places(db, user.id)
+    return await utils.get_user_created_places(user, db)
 
 
 @router.delete("/places/{place_id}", status_code=204)
