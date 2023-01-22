@@ -1,4 +1,5 @@
 from fastapi import BackgroundTasks, APIRouter, UploadFile, File, Depends, HTTPException, Form
+from typing import Union
 import cv2
 import numpy as np
 from sqlalchemy.orm import Session
@@ -37,7 +38,7 @@ async def create_place(background_tasks: BackgroundTasks,
                        name: str = Form(),
                        code: str = Form(),
                        address: str = Form(),
-                       description: str = Form(),
+                       description: str = Form(None),
                        file: UploadFile = File(...),
                        db: Session = Depends(get_db),
                        user: schemas.User = Depends(crud.get_current_user)):
