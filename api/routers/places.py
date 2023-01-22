@@ -19,7 +19,7 @@ router = APIRouter(
 async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db),
                      user: schemas.User = Depends(crud.get_current_user_or_none)):
 
-    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_COLOR)
     if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
     places = best_match(image, db)
@@ -43,7 +43,7 @@ async def create_place(background_tasks: BackgroundTasks,
                        db: Session = Depends(get_db),
                        user: schemas.User = Depends(crud.get_current_user)):
 
-    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_COLOR)
     if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
 
