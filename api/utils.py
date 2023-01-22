@@ -75,7 +75,7 @@ def bag_of_vwords_search(image_):
 
     descriptor = features(image_)
     histogram = build_histogram(descriptor, kmeans)
-    neighbor = NearestNeighbors(n_neighbors=40)
+    neighbor = NearestNeighbors(n_neighbors=40, algorithm='ball_tree', metric='euclidean')
     neighbor.fit(preprocessed_image)
     dist, result = neighbor.kneighbors([histogram])
 
@@ -95,6 +95,7 @@ def match(img_raw):
 
     # start = time.time()
     bag_of_vwords_search_result = bag_of_vwords_search(img_raw)
+    print(bag_of_vwords_search_result)
     images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
     # images_paths_ = bovw(img_raw)
     # end = time.time()
