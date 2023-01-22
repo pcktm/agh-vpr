@@ -95,7 +95,6 @@ def match(img_raw):
 
     # start = time.time()
     bag_of_vwords_search_result = bag_of_vwords_search(img_raw)
-    print(bag_of_vwords_search_result)
     images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
     # images_paths_ = bovw(img_raw)
     # end = time.time()
@@ -127,8 +126,6 @@ def match(img_raw):
         best.append((len(mkpts0), image))
 
     best.sort(key=lambda tup: tup[0], reverse=True)
-    print(best)
-
     return best
 
 
