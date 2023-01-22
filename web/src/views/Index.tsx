@@ -69,7 +69,7 @@ export default function IndexView() {
                   className="flex-1"
                 />
                 {
-                  user && (
+                  false && (
                     <GlowButton
                       onClick={() => navigate('/add')}
                       className="border-teal-800 bg-teal-600 bg-opacity-10 hover:border-teal-600"
