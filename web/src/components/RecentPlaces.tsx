@@ -1,3 +1,4 @@
+import {useToast} from '@chakra-ui/react';
 import {Place} from '../utils/stores';
 import {useAxios, useAxiosSWR, useMutate} from '../utils/useAxios';
 import {SmallPlaceBox} from './PlaceBox';
@@ -6,10 +7,18 @@ export default function RecentPlacesList() {
   const {data: places, error, isLoading} = useAxiosSWR<Place[]>('/history/');
   const axios = useAxios();
   const mutate = useMutate();
+  const toast = useToast();
 
   const clearHistory = async () => {
     await axios.delete('/history/');
-    mutate('/history/');
+    await mutate('/history/');
+    toast({
+      title: 'Historia wyczyszczona',
+      description: 'Pomyślnie wyczyszczono historię',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   return (
@@ -30,7 +39,7 @@ export default function RecentPlacesList() {
           }
         {
             places && places?.length > 0 && (
-              <div className="flex flex-col gap-0">
+              <div className="flex flex-col gap-2">
                 {
                   places.map((place) => (
                     <SmallPlaceBox key={place.id} result={place} />

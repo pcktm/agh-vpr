@@ -23,6 +23,7 @@ export const useAuthStore = create<AuthState>()(
 export type Place = {
   id: number;
   name: string;
+  code: string;
   description: string;
   address: string;
   main_image: string;

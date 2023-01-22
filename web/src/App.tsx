@@ -7,6 +7,7 @@ import {
   redirect,
 } from 'react-router-dom';
 import {useAuthStore, useUserStore} from './utils/stores';
+import AddPlaceView from './views/AddPlace';
 import IndexView from './views/Index';
 import LoginView from './views/Login';
 import ProfileView from './views/Profile';
@@ -43,6 +44,7 @@ function App() {
               return null;
             }}
           />,
+          <Route path="/add" element={<AddPlaceView />} />,
         ]),
       )}
       />

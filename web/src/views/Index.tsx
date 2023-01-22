@@ -1,16 +1,21 @@
 import {useEffect, useState} from 'react';
-import {BuildingLibraryIcon} from '@heroicons/react/24/outline';
+import {BuildingLibraryIcon, PlusIcon} from '@heroicons/react/24/outline';
+import {useNavigate} from 'react-router-dom';
 import PhotoCaptureInput from '../components/PhotoCaptureInput';
 import {SearchResults} from '../types';
 import SearchResultsDisplay from '../components/SearchResultsDisplay';
 import styles from '../styles/hero.module.scss';
 import Navbar from '../components/Navbar';
 import {useAxios} from '../utils/useAxios';
+import {useUserStore} from '../utils/stores';
+import GlowButton from '../components/GlowButton';
 
 export default function IndexView() {
   const [isSearching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResults>([]);
   const axios = useAxios();
+  const user = useUserStore((state) => state.user);
+  const navigate = useNavigate();
 
   const handleSearch = async (image: File) => {
     if (!image) {
@@ -41,7 +46,7 @@ export default function IndexView() {
 
   return (
     <>
-      <div className={`${styles.background} min-h-screen pt-4 border-b border-slate-400 rounded-b-xl`}>
+      <div className={`${styles.background} min-h-screen pt-4 border-b border-teal-900 rounded-b-xl`}>
         <Navbar />
         <div className="p-2 flex flex-row justify-center">
           <div className="flex flex-col mt-3 lg:mt-24 container mx-auto">
@@ -55,12 +60,26 @@ export default function IndexView() {
               <h2 className="text-lg md:text-2xl mt-0 md:mt-2 font-bold text-slate-300">
                 Nie wiesz gdzie jesteś? Zrób zdjęcie!
               </h2>
-              <PhotoCaptureInput
-                onSelect={(file) => {
-                  handleSearch(file);
-                }}
-                loading={isSearching}
-              />
+              <div className="flex md:flex-row flex-col-reverse mt-10 gap-2">
+                <PhotoCaptureInput
+                  onSelect={(file) => {
+                    handleSearch(file);
+                  }}
+                  loading={isSearching}
+                  className="flex-1"
+                />
+                {
+                  false && (
+                    <GlowButton
+                      onClick={() => navigate('/add')}
+                      className="border-teal-800 bg-teal-600 bg-opacity-10 hover:border-teal-600"
+                    >
+                      <PlusIcon className="w-7 h-7" />
+                      Dodaj budynek
+                    </GlowButton>
+                  )
+                }
+              </div>
             </div>
             <div className="mt-8 transition-all">
               <SearchResultsDisplay results={searchResults} loading={isSearching} />
@@ -71,7 +90,15 @@ export default function IndexView() {
       <div className="container mt-2 mx-auto p-4">
         <h3 className="text-lg">Jak to działa?</h3>
         <p className="text-sm text-slate-300">
-          Aplikacja wykorzystuje...
+          Najpierw ze zdjęcia które zrobisz zostaną wyodrębnione lokalne cechy charakterystyczne, a na ich podstawie wyszukamy najbliższe im
+          zdjęcia budynków z bazy danych. Następnie każde z tych wyszukanych prawdopodobnych par budynków zostanie porównane przez
+          głęboką grafową sieć neuronową, która spróbuje znaleźć największe podobieństwo między twoim zdjęciem, a naszymi.
+          Pokazujemy Ci tylko te budynki, które są najbardziej prawdopodobne.
+        </p>
+        <h3 className="text-lg mt-4">Czy zapisujecie zdjęcia?</h3>
+        <p className="text-sm text-slate-300">
+          Zapisujemy zdjęcia tylko jeśli zdecydujesz się dodać swoje zdjęcie do naszej wyszukiwarki. W przeciwnym wypadku zdjęcia są
+          usuwane zaraz po przetworzeniu.
         </p>
       </div>
     </>

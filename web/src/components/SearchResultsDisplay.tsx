@@ -32,7 +32,7 @@ export default function SearchResultsDisplay({results, loading}: {results: Searc
       <p className={`text-sm text-slate-300 transition-all duration-500 ${results?.length ? 'opacity-100' : 'opacity-0'}`}>
         {results?.length ? `${results.length} ${polishPlurals('wynik', 'wyniki', 'wyników', results.length)}` : ' '}
       </p>
-      <div ref={parent} className="pt-3">
+      <div ref={parent} className="pt-3 flex flex-col gap-2">
         {
           results.length > 0 && (
             <>

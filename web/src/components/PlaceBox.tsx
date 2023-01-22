@@ -3,9 +3,9 @@ import {MapPinIcon} from '@heroicons/react/24/outline';
 import Balancer from 'react-wrap-balancer';
 import {SearchResult as TSearchResult} from '../types';
 
-export function SmallPlaceBox({result}: {result: TSearchResult}) {
+export function SmallPlaceBox({result, children}: {result: TSearchResult, children?: React.ReactNode}) {
   return (
-    <div className="border border-slate-600 backdrop-blur-sm backdrop-brightness-110 my-1.5 rounded-md flex flex-col sm:flex-row gap-2 overflow-hidden">
+    <div className="flex-1 border border-slate-600 backdrop-blur-sm backdrop-brightness-110 rounded-md flex flex-col sm:flex-row gap-2 overflow-hidden">
       <img
         src={import.meta.env.VITE_API_URL + result.main_image}
         alt={result.name}
@@ -32,9 +32,16 @@ export function SmallPlaceBox({result}: {result: TSearchResult}) {
           </p>
         </div>
       </div>
+      <div className="flex p-2">
+        {children}
+      </div>
     </div>
   );
 }
+
+SmallPlaceBox.defaultProps = {
+  children: null,
+};
 
 export function LargePlaceBox({result}: {result: TSearchResult}) {
   return (

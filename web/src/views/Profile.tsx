@@ -1,16 +1,49 @@
-import {ArrowLeftIcon, ClockIcon, UserCircleIcon} from '@heroicons/react/24/outline';
+import {
+  ArrowLeftIcon, ClockIcon, PlusIcon, UserCircleIcon,
+} from '@heroicons/react/24/outline';
 import {useEffect, useMemo} from 'react';
 import {useNavigate, Link} from 'react-router-dom';
 import gravatarUrl from 'gravatar-url';
+import {
+  Modal, ModalBody, ModalContent, ModalOverlay, useDisclosure,
+} from '@chakra-ui/react';
 import {useAuthStore, User, useUserStore} from '../utils/stores';
 import RecentPlacesList from '../components/RecentPlaces';
 import {useAxios, useAxiosSWR} from '../utils/useAxios';
+import CreatedPlacesList from '../components/CreatedPlacesList';
+import AddPlaceForm from '../components/AddPlaceForm';
+
+const CreatedPlacesSection = () => {
+  const {isOpen, onOpen, onClose} = useDisclosure();
+  return (
+    <>
+      <div className="flex flex-col w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+          <h2 className="text-2xl font-bold font-secondary">Utworzone miejsca</h2>
+          <button className="text-green-500 text-md flex items-center gap-1 hover:underline" onClick={onOpen} type="button">
+            <PlusIcon className="h-5 w-5" />
+            Dodaj nowe miejsce
+          </button>
+        </div>
+        <CreatedPlacesList />
+      </div>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent bgColor="gray.900" textColor="white" p={0}>
+          <ModalBody p={0}>
+            <AddPlaceForm onSubmit={onClose} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
 
 export default function ProfileView() {
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
   const avatarUrl = useMemo(() => gravatarUrl(user?.email ?? 'AGH', {size: 256, default: 'identicon'}), [user?.email]);
-  const {data: currentUser, isLoading: isLastLoginLoading} = useAxiosSWR<User>('/user/me');
+  const {data: currentUser} = useAxiosSWR<User>('/user/me');
   const axios = useAxios();
 
   if (!user) {
@@ -86,7 +119,9 @@ export default function ProfileView() {
         </div>
       </div>
 
-      <div className="flex flex-col w-full">
+      <CreatedPlacesSection />
+
+      <div className="flex flex-col w-full mt-4">
         <h2 className="text-2xl font-bold font-secondary">Ostatnio odwiedzone miejsca</h2>
         <RecentPlacesList />
       </div>
