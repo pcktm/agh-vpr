@@ -1,7 +1,7 @@
 import {useState, ChangeEvent} from 'react';
 import {CameraIcon} from '@heroicons/react/24/outline';
 
-export default function PhotoCaptureInput({onSelect, loading}: {onSelect: (file: File) => void, loading?: boolean}) {
+export default function PhotoCaptureInput({onSelect, loading, className}: {onSelect: (file: File) => void, loading?: boolean, className?: string}) {
   const [photo, setPhoto] = useState<File | null>(null);
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -13,8 +13,8 @@ export default function PhotoCaptureInput({onSelect, loading}: {onSelect: (file:
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-start w-full mt-10">
+    <div className={className}>
+      <div className="flex items-center justify-start w-full">
         <label
           htmlFor="dropzone-file"
           // eslint-disable-next-line max-len
@@ -43,4 +43,5 @@ export default function PhotoCaptureInput({onSelect, loading}: {onSelect: (file:
 
 PhotoCaptureInput.defaultProps = {
   loading: false,
+  className: '',
 };
