@@ -51,15 +51,34 @@ export default function AddPlaceForm({onSubmit}: {onSubmit: () => void}) {
       });
       await mutate('/user/places');
       onSubmit();
-    } catch (err) {
-      console.error(err);
-      postToast({
-        title: 'Błąd',
-        description: 'Nie udało się dodać miejsca',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+    } catch (error: any) {
+      console.error(error);
+
+      if (error.response.status === 415) {
+        postToast({
+          title: 'Błąd',
+          description: 'Niepoprawny format zdjęcia',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      } else if (error.response.status === 422) {
+        postToast({
+          title: 'Błąd',
+          description: 'Niepoprawne dane miejsca',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        postToast({
+          title: 'Błąd',
+          description: 'Nie udało się dodać miejsca',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -67,9 +86,8 @@ export default function AddPlaceForm({onSubmit}: {onSubmit: () => void}) {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="w-full p-6 md:p-8 rounded border border-indigo-600 backdrop-brightness-125">
-        <h1 className="text-3xl font-bold font-secondary">Dodaj miejsce</h1>
-        <p className="text-lg font-secondary">Wypełnij poniższy formularz, aby dodać nowe miejsce</p>
+      <div className="w-full rounded">
+
         <form
           onSubmit={handleSubmit(postForm)}
         >

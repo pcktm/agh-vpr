@@ -5,7 +5,7 @@ import {useEffect, useMemo} from 'react';
 import {useNavigate, Link} from 'react-router-dom';
 import gravatarUrl from 'gravatar-url';
 import {
-  Modal, ModalBody, ModalContent, ModalOverlay, useDisclosure,
+  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, useDisclosure,
 } from '@chakra-ui/react';
 import {useAuthStore, User, useUserStore} from '../utils/stores';
 import RecentPlacesList from '../components/RecentPlaces';
@@ -27,10 +27,15 @@ const CreatedPlacesSection = () => {
         </div>
         <CreatedPlacesList />
       </div>
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <Modal isOpen={isOpen} onClose={onClose} size="lg">
         <ModalOverlay />
-        <ModalContent bgColor="gray.900" textColor="white" p={0}>
-          <ModalBody p={0}>
+        <ModalContent bgColor="rgb(15 23 42)" textColor="white" border="1px" borderColor="#4338ca">
+          <ModalHeader>
+            <ModalCloseButton />
+            <h1 className="text-3xl font-bold font-secondary">Dodaj miejsce</h1>
+            <p className="text-lg font-secondary">Wypełnij poniższy formularz, aby dodać nowe miejsce</p>
+          </ModalHeader>
+          <ModalBody mb={4}>
             <AddPlaceForm onSubmit={onClose} />
           </ModalBody>
         </ModalContent>

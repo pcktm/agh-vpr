@@ -22,6 +22,8 @@ export default function AddPlaceView() {
           </div>
         </Link>
       </div>
+      <h1 className="text-3xl font-bold font-secondary">Dodaj miejsce</h1>
+      <p className="text-lg font-secondary">Wypełnij poniższy formularz, aby dodać nowe miejsce</p>
       <AddPlaceForm onSubmit={handleSubmit} />
     </div>
   );

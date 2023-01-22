@@ -26,6 +26,7 @@ export const useAxios = () => {
         setToken('');
         setUser(undefined);
       }
+      return Promise.reject(error);
     });
 
     return instance;
