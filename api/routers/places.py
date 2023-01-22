@@ -3,6 +3,7 @@ from typing import Union
 import cv2
 import numpy as np
 from sqlalchemy.orm import Session
+import uuid
 from utils import best_match, add_image_to_file
 
 from database import get_db
@@ -52,14 +53,8 @@ async def create_place(background_tasks: BackgroundTasks,
         place = {"name": name, "code": code, "address": address, "description": description}
 
         db_place = await crud.create_place(db, place, user)
-        n = crud.get_number_of_images(db) + 1
-        file_path = f'images_from_user/image{n}.png'
-        i = crud.get_image_by_name_b(db, file_path)
-        while i:
-            n += 1
-            file_path = f'images_from_user/image{n}.png'
-            i = crud.get_image_by_name_b(db, file_path)
-
+        guid = uuid.uuid4()
+        file_path = f'images_from_user/{guid}.png'
         cv2.imwrite(f"VPR/{file_path}", image)
 
         image_schema = schemas.ImageCreate(place_id=db_place.id, image=file_path)
