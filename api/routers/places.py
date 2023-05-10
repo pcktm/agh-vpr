@@ -3,7 +3,6 @@ from typing import Union
 import cv2
 import numpy as np
 from sqlalchemy.orm import Session
-import uuid
 from utils import best_match, add_image_to_file
 
 from database import get_db
@@ -17,20 +16,20 @@ router = APIRouter(
 
 
 @router.post("/find")
-async def find_place(file: UploadFile = File(...), db: Session = Depends(get_db),
-                     user: schemas.User = Depends(crud.get_current_user_or_none)):
-
-    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_COLOR)
+async def find_place(longitude: float = Form(None), latitude: float = Form(None),
+                     file: UploadFile = File(...), db: Session = Depends(get_db)): #,
+                     # user: schemas.User = Depends(crud.get_current_user_or_none)):
+    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
     if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
-    places = best_match(image, db)
-    if user is not None:
-        if len(places) > 0:
-            place_id = places[0]['id']
-            if not crud.exist_in_history(db, user, place_id):
-                await crud.add_to_history(db, user, place_id)
-            else:
-                await crud.update_history_date(db, user, place_id)
+    places = best_match(db, image, latitude, longitude)
+    # if user is not None:
+    #     if len(places) > 0:
+    #         place_id = places[0]['id']
+    #         if not crud.exist_in_history(db, user, place_id):
+    #             await crud.add_to_history(db, user, place_id)
+    #         else:
+    #             await crud.update_history_date(db, user, place_id)
     return places
 
 
@@ -43,8 +42,7 @@ async def create_place(background_tasks: BackgroundTasks,
                        file: UploadFile = File(...),
                        db: Session = Depends(get_db),
                        user: schemas.User = Depends(crud.get_current_user)):
-
-    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_COLOR)
+    image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
     if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
 
@@ -53,8 +51,14 @@ async def create_place(background_tasks: BackgroundTasks,
         place = {"name": name, "code": code, "address": address, "description": description}
 
         db_place = await crud.create_place(db, place, user)
-        guid = uuid.uuid4()
-        file_path = f'images_from_user/{guid}.png'
+        n = crud.get_number_of_images(db) + 1
+        file_path = f'images_from_user/image{n}.png'
+        i = crud.get_image_by_name_b(db, file_path)
+        while i:
+            n += 1
+            file_path = f'images_from_user/image{n}.png'
+            i = crud.get_image_by_name_b(db, file_path)
+
         cv2.imwrite(f"VPR/{file_path}", image)
 
         image_schema = schemas.ImageCreate(place_id=db_place.id, image=file_path)

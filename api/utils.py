@@ -9,7 +9,6 @@ from VPR.models.matching import Matching
 from VPR.models.utils import read_image
 from VPR.BOVW import features, build_histogram, bow_and_tfidf, faiss_kmeans, calculate_descriptors
 from sklearn.neighbors import NearestNeighbors
-from glob import glob
 from copy import deepcopy
 
 import crud as crud
@@ -82,6 +81,49 @@ def bag_of_vwords_search(image_):
     return result[0]
 
 
+# define a function to compare longitudes and latitudes of two points and return the distance between them
+def distance(lat1, lon1, lat2, lon2):
+    # The math module contains a function named
+    # radians which converts from degrees to radians.
+    lon1 = np.radians(lon1)
+    lon2 = np.radians(lon2)
+    lat1 = np.radians(lat1)
+    lat2 = np.radians(lat2)
+
+    # Haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * \
+                                np.cos(lat2) * np.sin(dlon / 2) ** 2
+
+    c = 2 * np.arcsin(np.sqrt(a))
+
+    # Radius of earth in kilometers. Use 3956 for miles
+    r = 6371
+
+    # calculate the result
+    return c * r
+
+
+# define a function check the distance of one point with all the points from list and returns this list but sorted
+# by distance
+def check_distance(db, latitude, longitude, places):
+    sorted_places = []
+
+    distances = {}
+    for place in places:
+        longitude_, latitude_ = crud.get_longitudes_and_latitudes(db=db, place_id=place['id'])
+        distances[place['id']] = distance(latitude, longitude, latitude_, longitude_)
+    distances = dict(sorted(distances.items(), key=lambda x: x[1]))
+
+    for place_id in distances.keys():
+        for place in places:
+            if place['id'] == place_id:
+                sorted_places.append(place)
+
+    return sorted_places
+
+
 def match(img_raw):
 
     with open('VPR/data_agh/images.pth', 'rb') as fp:
@@ -98,7 +140,7 @@ def match(img_raw):
     images_paths_ = [images_paths[x] for x in bag_of_vwords_search_result]
     # images_paths_ = bovw(img_raw)
     # end = time.time()
-    # print(end - start)
+    # images_paths_ = images_paths
 
     best = []
 
@@ -129,7 +171,7 @@ def match(img_raw):
     return best
 
 
-def best_match(image_, db):
+def best_match(db, image_, latitude, longitude):
     best = match(image_)
 
     places = []
@@ -153,6 +195,8 @@ def best_match(image_, db):
                     places.append(place)
         except:
             pass
+
+    places = check_distance(db, latitude, longitude, places)
     return places
 
 

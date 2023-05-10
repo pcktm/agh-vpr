@@ -301,3 +301,8 @@ async def update_history_date(db: Session, user: schemas.User, place_id: int):
 
     db.commit()
     db.refresh(history)
+
+
+def get_longitudes_and_latitudes(db: Session, place_id: int):
+    place = db.query(models.Place).filter(models.Place.id == place_id).first()
+    return place.longitude, place.latitude

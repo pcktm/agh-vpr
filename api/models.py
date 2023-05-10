@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float
 from sqlalchemy.orm import relationship
 import passlib.hash as _hash
 import datetime as date
@@ -32,6 +32,8 @@ class Place(Base):
     description = Column(String, index=True)
     main_image_id = Column(Integer, index=True)
     creator_id = Column(Integer, index=True)
+    longitude = Column(Float, index=True)
+    latitude = Column(Float, index=True)
 
     images = relationship("Image", back_populates="place")
     # histories = relationship("History", back_populates='place')

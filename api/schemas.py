@@ -74,6 +74,8 @@ class PlaceBase(BaseModel):
     code: str
     address: str
     description: str
+    longitude: float
+    latitude: float
 
 
 class PlaceCreate(PlaceBase):
