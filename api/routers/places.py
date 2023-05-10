@@ -17,19 +17,19 @@ router = APIRouter(
 
 @router.post("/find")
 async def find_place(longitude: float = Form(None), latitude: float = Form(None),
-                     file: UploadFile = File(...), db: Session = Depends(get_db)): #,
-                     # user: schemas.User = Depends(crud.get_current_user_or_none)):
+                     file: UploadFile = File(...), db: Session = Depends(get_db),
+                     user: schemas.User = Depends(crud.get_current_user_or_none)):
     image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
     if image is None:
         raise HTTPException(status_code=415, detail="Unsupported Media Type, attach an image.")
     places = best_match(db, image, latitude, longitude)
-    # if user is not None:
-    #     if len(places) > 0:
-    #         place_id = places[0]['id']
-    #         if not crud.exist_in_history(db, user, place_id):
-    #             await crud.add_to_history(db, user, place_id)
-    #         else:
-    #             await crud.update_history_date(db, user, place_id)
+    if user is not None:
+        if len(places) > 0:
+            place_id = places[0]['id']
+            if not crud.exist_in_history(db, user, place_id):
+                await crud.add_to_history(db, user, place_id)
+            else:
+                await crud.update_history_date(db, user, place_id)
     return places
 
 
