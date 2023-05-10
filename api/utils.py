@@ -195,8 +195,8 @@ def best_match(db, image_, latitude, longitude):
                     places.append(place)
         except:
             pass
-
-    places = check_distance(db, latitude, longitude, places)
+    if longitude is not None and latitude is not None:
+        places = check_distance(db, latitude, longitude, places)
     return places
 
 
