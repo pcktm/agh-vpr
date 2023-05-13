@@ -213,6 +213,13 @@ def get_image_by_id(db: Session, image_id: int):
     return db.query(models.Image).filter(models.Image.id == image_id).first()
 
 
+def get_images_by_place_id(db: Session, place_id: int):
+    images = db.query(models.Image).filter(models.Image.place_id == place_id).all()
+
+    if images is not None:
+        return list(map(schemas.Image.from_orm, images))
+
+
 async def add_image(db: Session, image: schemas.ImageCreate):
     image_name = image.image
     place_id = image.place_id
