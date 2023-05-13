@@ -202,7 +202,6 @@ async def get_places_from_history(user, db):
             place['date'] = date
             place["main_image"] = filepath
             places.append(place)
-
     return places
 
 
