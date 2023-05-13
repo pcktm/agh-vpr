@@ -1,6 +1,7 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {BuildingLibraryIcon, PlusIcon} from '@heroicons/react/24/outline';
 import {useNavigate} from 'react-router-dom';
+import autoAnimate from '@formkit/auto-animate';
 import PhotoCaptureInput from '../components/PhotoCaptureInput';
 import {SearchResults} from '../types';
 import SearchResultsDisplay from '../components/SearchResultsDisplay';
@@ -9,13 +10,20 @@ import Navbar from '../components/Navbar';
 import {useAxios} from '../utils/useAxios';
 import {useUserStore} from '../utils/stores';
 import GlowButton from '../components/GlowButton';
+import LocationPrompt from '../components/LocationPrompt';
 
 export default function IndexView() {
   const [isSearching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResults>([]);
+  const [userLocation, setUserLocation] = useState<GeolocationCoordinates | null>(null);
   const axios = useAxios();
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
+  const buttonParent = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (buttonParent.current) autoAnimate(buttonParent.current, {duration: 600});
+  }, [buttonParent]);
 
   const handleSearch = async (image: File) => {
     if (!image) {
@@ -30,6 +38,8 @@ export default function IndexView() {
     setSearchResults([]);
     const formData = new FormData();
     formData.append('file', image);
+    formData.append('longitude', userLocation?.longitude.toString() ?? '');
+    formData.append('latitude', userLocation?.latitude.toString() ?? '');
     try {
       const {data} = await axios.post<SearchResults>('/place/find', formData, {
         headers: {
@@ -60,14 +70,18 @@ export default function IndexView() {
               <h2 className="text-lg md:text-2xl mt-0 md:mt-2 font-bold text-slate-300">
                 Nie wiesz gdzie jesteś? Zrób zdjęcie!
               </h2>
-              <div className="flex md:flex-row flex-col-reverse mt-10 gap-2">
-                <PhotoCaptureInput
-                  onSelect={(file) => {
-                    handleSearch(file);
-                  }}
-                  loading={isSearching}
-                  className="flex-1"
-                />
+              <div className="flex md:flex-row flex-col-reverse mt-10 gap-2 transition-all" ref={buttonParent}>
+                {
+                  userLocation ? (
+                    <PhotoCaptureInput
+                      onSelect={(file) => {
+                        handleSearch(file);
+                      }}
+                      loading={isSearching}
+                      className="flex-1"
+                    />
+                  ) : <LocationPrompt onLocationChange={setUserLocation} />
+                }
                 {
                   false && (
                     <GlowButton

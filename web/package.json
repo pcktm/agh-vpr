@@ -16,6 +16,7 @@
     "@fontsource/secular-one": "^4.5.9",
     "@formkit/auto-animate": "^1.0.0-beta.5",
     "@heroicons/react": "^2.0.13",
+    "@vitejs/plugin-basic-ssl": "^1.0.1",
     "axios": "^1.2.1",
     "framer-motion": "^8.5.0",
     "gravatar-url": "^4.0.1",

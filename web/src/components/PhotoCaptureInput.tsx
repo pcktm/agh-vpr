@@ -31,7 +31,7 @@ export default function PhotoCaptureInput({onSelect, loading, className}: {onSel
             type="file"
             className="hidden"
             accept="image/*"
-            capture="environment"
+            // capture="environment"
             onChange={handlePhotoChange}
             disabled={loading}
           />
