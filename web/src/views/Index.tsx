@@ -90,15 +90,14 @@ export default function IndexView() {
       <div className="container mt-2 mx-auto p-4">
         <h3 className="text-lg">Jak to działa?</h3>
         <p className="text-sm text-slate-300">
-          Najpierw ze zdjęcia które zrobisz zostaną wyodrębnione lokalne cechy charakterystyczne, a na ich podstawie wyszukamy najbliższe im
-          zdjęcia budynków z bazy danych. Następnie każde z tych wyszukanych prawdopodobnych par budynków zostanie porównane przez
+          Najpierw filtrujemy budynki po lokalizacji, w której się znajdujesz.
+          Następnie każde z tych wyszukanych prawdopodobnych par budynków zostanie porównane przez
           głęboką grafową sieć neuronową, która spróbuje znaleźć największe podobieństwo między twoim zdjęciem, a naszymi.
           Pokazujemy Ci tylko te budynki, które są najbardziej prawdopodobne.
         </p>
         <h3 className="text-lg mt-4">Czy zapisujecie zdjęcia?</h3>
         <p className="text-sm text-slate-300">
-          Zapisujemy zdjęcia tylko jeśli zdecydujesz się dodać swoje zdjęcie do naszej wyszukiwarki. W przeciwnym wypadku zdjęcia są
-          usuwane zaraz po przetworzeniu.
+          Nie, nigdy nie zapisujemy przesłanych przez Ciebie zdjęć.
         </p>
       </div>
     </>
