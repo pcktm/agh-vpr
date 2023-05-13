@@ -124,7 +124,7 @@ export default function ProfileView() {
         </div>
       </div>
 
-      <CreatedPlacesSection />
+      {/* <CreatedPlacesSection /> */}
 
       <div className="flex flex-col w-full mt-4">
         <h2 className="text-2xl font-bold font-secondary">Ostatnio odwiedzone miejsca</h2>
