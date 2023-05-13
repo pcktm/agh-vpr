@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 @router.post("/find")
-async def find_place(longitude: float = Form(None), latitude: float = Form(None),
+async def find_place(longitude: float = Form(), latitude: float = Form(),
                      file: UploadFile = File(...), db: Session = Depends(get_db),
                      user: schemas.User = Depends(crud.get_current_user_or_none)):
     image = cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_UNCHANGED)
